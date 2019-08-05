@@ -2,7 +2,10 @@
 
 # directory variables
 dotfilesGitDir=".dotfiles"
-backupDir=".config-backup"
+backupDir="dotfiles-backup"
+
+# go home
+cd $HOME
 
 # do a bare clone to avoid overwriting existing config files
 git clone --bare git@github.com:Naycon/dotfiles.git $HOME/$dotfilesGitDir
@@ -18,10 +21,10 @@ config checkout
 if [ $? = 0 ]; then
   echo "Dotfiles successfully added!"
 else
-  echo "Backing up existing dotfiles to $backupDir."
+  echo "Backing up existing dotfiles to '$backupDir'..."
   mkdir -p $backupDir
   config checkout 2>&1 | egrep "\s+\." | awk {'print $1'} | xargs -I{} mv {} $backupDir/{}
-  echo "Backup complete..."
+  echo "Backup complete."
   
   config checkout
   
