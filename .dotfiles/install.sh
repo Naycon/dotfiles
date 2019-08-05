@@ -23,7 +23,7 @@ if [ $? = 0 ]; then
 else
   echo "Backing up existing dotfiles to '$backupDir'..."
   mkdir -p $backupDir
-  config checkout 2>&1 | egrep "\s+\." | awk {'print $1'} | xargs -I{} mv {} $backupDir/{}
+  config checkout 2>&1 | egrep "\s+\." | awk {'print $1'} | xargs -I{} mv {} {}.dotfilesbak
   echo "Backup complete."
   
   config checkout
