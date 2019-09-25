@@ -69,6 +69,9 @@ autocmd BufWritePre * :%s/\s\+$//e
 :tnoremap <Esc> <C-\><C-n>
 " gh switches between the last two buffers
 :nnoremap gh :b#<CR>
+" ctrl + f to search all files
+:nnoremap <C-f> :BLines<CR>
+:nnoremap <C-g> :Rg<space>
 
 " AIRLINE CONFIG
 let g:airline#extensions#tabline#enabled = 1
