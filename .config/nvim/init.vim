@@ -141,6 +141,7 @@ function! FloatingFZF()
   call nvim_open_win(buf, v:true, opts)
 endfunction
 
+:nnoremap <silent> gb :Buffers<CR>
 " ===================================
 
 
