@@ -24,22 +24,33 @@ Plug 'morhetz/gruvbox'
 
 " Initialize plugin system
 call plug#end()
+" ===================================
 
 " SET COLOR SCHEME/THEME
 colorscheme gruvbox
+" ===================================
+
 
 " ENABLE TRUECOLORS
 set termguicolors
+" ===================================
+
 
 " REMAP LEADER
 :let mapleader = "\ö"
+" ===================================
+
 
 " SHOW LINE NUMBERS
 set number
+" ===================================
+
 
 " SPLIT BEHAVIOUR
 set splitbelow
 set splitright
+" ===================================
+
 
 " SET TABS TO 2 SPACES
 filetype plugin indent on
@@ -50,6 +61,8 @@ set tabstop=2
 set softtabstop=2
 " when indenting with '>', use 2 spaces width
 set shiftwidth=2
+" ===================================
+
 
 " TRIM WHITESPACE ON SAVE
 function! <SID>StripTrailingWhitespaces()
@@ -61,6 +74,8 @@ endfun
 " Change * below if stripping is not desired on all file endings. E.g. set it
 " to *.js to only strip whitespace on js files.
 autocmd BufWritePre * :%s/\s\+$//e
+" ===================================
+
 
 " KEYBINDINGS
 :nnoremap <silent> <C-p> :Files<CR>
@@ -72,10 +87,14 @@ autocmd BufWritePre * :%s/\s\+$//e
 " ctrl + f to search all files
 :nnoremap <C-f> :BLines<CR>
 :nnoremap <C-g> :Rg<space>
+" ===================================
+
 
 " AIRLINE CONFIG
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
+" ===================================
+
 
 " BETTER RAINBOW PARENTHESIS
 let g:rbpt_max = 16
@@ -84,6 +103,46 @@ au VimEnter * RainbowParenthesesToggle
 au Syntax * RainbowParenthesesLoadRound
 au Syntax * RainbowParenthesesLoadSquare
 au Syntax * RainbowParenthesesLoadBraces
+" ===================================
+
+
+" FZF CONFIG
+" Reverse the layout to make the FZF list top-down
+let $FZF_DEFAULT_OPTS='--layout=default --border --margin=0,2'
+
+" Using the custom window creation function
+let g:fzf_layout = { 'window': 'call FloatingFZF()' }
+
+" Function to create the custom floating window
+function! FloatingFZF()
+  " creates a scratch, unlisted, new, empty, unnamed buffer
+  " to be used in the floating window
+  let buf = nvim_create_buf(v:false, v:true)
+
+  " 70% of the height
+  let height = float2nr(&lines * 0.7)
+  " 70% of the height
+  let width = float2nr(&columns * 0.7)
+  " horizontal position (centralized)
+  let horizontal = float2nr((&columns - width) / 2)
+  " vertical position (centralized)
+  let vertical = float2nr((&lines - height) / 2)
+
+  let opts = {
+        \ 'relative': 'editor',
+        \ 'row': vertical,
+        \ 'col': horizontal,
+        \ 'width': width,
+        \ 'height': height,
+        \ 'style': 'minimal'
+        \ }
+
+  " open the new window, floating, and enter to it
+  call nvim_open_win(buf, v:true, opts)
+endfunction
+
+" ===================================
+
 
 " COC CONFIG
 " if hidden is not set, TextEdit might fail.
@@ -209,6 +268,8 @@ nnoremap <silent> <space>j  :<C-u>CocNext<CR>
 nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
 " Resume latest coc list
 nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
+" ===================================
+
 
 " EASYMOTION CONFIG
 let g:EasyMotion_keys = 'asdghklöqwertyuiopzxcvbnmfj'
@@ -238,4 +299,5 @@ nmap <Leader>w <Plug>(easymotion-overwin-w)
 " Two character search motion
 nmap s <Plug>(easymotion-s2)
 nmap t <Plug>(easymotion-t2)
+" ===================================
 
