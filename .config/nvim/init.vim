@@ -18,6 +18,10 @@ Plug 'leafgarland/typescript-vim'
 Plug 'tomtom/tcomment_vim'
 Plug 'machakann/vim-highlightedyank'
 Plug 'easymotion/vim-easymotion'
+Plug 'haya14busa/incsearch.vim'
+Plug 'haya14busa/incsearch-fuzzy.vim'
+Plug 'haya14busa/incsearch-easymotion.vim'
+Plug 'vim-scripts/SyntaxRange'
 
 " Color themes
 Plug 'morhetz/gruvbox'
@@ -26,18 +30,24 @@ Plug 'morhetz/gruvbox'
 call plug#end()
 " ===================================
 
-" SET COLOR SCHEME/THEME
-colorscheme gruvbox
-" ===================================
-
 
 " ENABLE TRUECOLORS
 set termguicolors
 " ===================================
 
 
+" GRUVBOX CONFIG
+let g:gruvbox_contrast_dark="hard"
+" ===================================
+
+
+" SET COLOR SCHEME/THEME
+colorscheme gruvbox
+" ===================================
+
+
 " REMAP LEADER
-:let mapleader = "\ö"
+:let mapleader = "\<space>"
 " ===================================
 
 
@@ -50,6 +60,7 @@ set number
 set splitbelow
 set splitright
 " ===================================
+
 
 
 " SET TABS TO 2 SPACES
@@ -254,51 +265,63 @@ set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 
 " Using CocList
 " Show all diagnostics
-nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
+" nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
 " Manage extensions
-nnoremap <silent> <space>e  :<C-u>CocList extensions<cr>
+" nnoremap <silent> <space>e  :<C-u>CocList extensions<cr>
 " Show commands
-nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
+" nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
 " Find symbol of current document
-nnoremap <silent> gs  :<C-u>CocList outline<cr>
+" nnoremap <silent> gs  :<C-u>CocList outline<cr>
 " Search workspace symbols
-nnoremap <silent> ga  :<C-u>CocList -I symbols<cr>
+" nnoremap <silent> ga  :<C-u>CocList -I symbols<cr>
 " Do default action for next item.
-nnoremap <silent> <space>j  :<C-u>CocNext<CR>
+" nnoremap <silent> <space>j  :<C-u>CocNext<CR>
 " Do default action for previous item.
-nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
+" nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
 " Resume latest coc list
-nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
+" nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 " ===================================
 
 
 " EASYMOTION CONFIG
-let g:EasyMotion_keys = 'asdghklöqwertyuiopzxcvbnmfj'
+let g:EasyMotion_keys = 'asdghklqwertyuiopzxcvbnmfj'
 
 " hjkl motions
-map <Leader>l <Plug>(easymotion-lineforward)
-map <Leader>j <Plug>(easymotion-j)
-map <Leader>k <Plug>(easymotion-k)
-map <Leader>h <Plug>(easymotion-linebackward)
+map <Leader>l <Plug>(easymotion-bd-el)
+map <Leader>j <Plug>(easymotion-bd-jk)
 let g:EasyMotion_startofline = 0 " keep cursor column when JK motionk
 
 " <Leader>f{char} to move to {char}
 map  <Leader>f <Plug>(easymotion-bd-f)
 nmap <Leader>f <Plug>(easymotion-overwin-f)
 
-" s{char}{char} to move to {char}{char}
-nmap s <Plug>(easymotion-overwin-f2)
-
-" Move to line
-map <Leader>L <Plug>(easymotion-bd-jk)
-nmap <Leader>L <Plug>(easymotion-overwin-line)
-
 " Move to word
 map  <Leader>w <Plug>(easymotion-bd-w)
 nmap <Leader>w <Plug>(easymotion-overwin-w)
 
 " Two character search motion
-nmap s <Plug>(easymotion-s2)
+map s <Plug>(easymotion-s2)
+nmap s <Plug>(easymotion-overwin-f2)
 nmap t <Plug>(easymotion-t2)
 " ===================================
 
+
+" INCSEARCH EASYMOTION CONFIG
+function! s:config_easyfuzzymotion(...) abort
+  return extend(copy({
+  \   'converters': [incsearch#config#fuzzy#converter()],
+  \   'modules': [incsearch#config#easymotion#module()],
+  \   'keymap': {"\<CR>": '<Over>(easymotion)'},
+  \   'is_expr': 0,
+  \   'is_stay': 1
+  \ }), get(a:, 1, {}))
+endfunction
+
+noremap <silent><expr> <Leader>s incsearch#go(<SID>config_easyfuzzymotion())
+" ===================================
+
+
+" SYNTAX RANGE (FOR ANGULAR TS FILES)
+au BufEnter *.ts :call SyntaxRange#Include('styles: \[\`\n', '\`\],', 'css', 'scss', 'sass')
+au BufEnter *.ts :call SyntaxRange#Include('template: \`', '\`,', 'html')
+" ===================================
