@@ -271,7 +271,7 @@ set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 " Show commands
 " nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
 " Find symbol of current document
-" nnoremap <silent> gs  :<C-u>CocList outline<cr>
+nnoremap <silent> gs  :<C-u>CocList outline<cr>
 " Search workspace symbols
 " nnoremap <silent> ga  :<C-u>CocList -I symbols<cr>
 " Do default action for next item.
@@ -287,7 +287,7 @@ set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 let g:EasyMotion_keys = 'asdghklqwertyuiopzxcvbnmfj'
 
 " hjkl motions
-map <Leader>l <Plug>(easymotion-bd-el)
+map <Leader>h <Plug>(easymotion-bd-el)
 map <Leader>j <Plug>(easymotion-bd-jk)
 let g:EasyMotion_startofline = 0 " keep cursor column when JK motionk
 
@@ -318,6 +318,7 @@ function! s:config_easyfuzzymotion(...) abort
 endfunction
 
 noremap <silent><expr> <Leader>s incsearch#go(<SID>config_easyfuzzymotion())
+noremap <silent><expr> <Leader>/ incsearch#go(<SID>config_easyfuzzymotion())
 " ===================================
 
 
