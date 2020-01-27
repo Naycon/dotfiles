@@ -285,12 +285,20 @@ nnoremap <silent> gs  :<C-u>CocList outline<cr>
 
 
 " EASYMOTION CONFIG
-let g:EasyMotion_keys = 'asdghklqwertyuiopzxcvbnmfj'
+let g:EasyMotion_keys = 'FKLAHSDGWERUIOGTYPQNVBMCXJÖ'
+
+" use upper case to display easymotion target labels (still allows use of
+" lower case keys)
+let g:EasyMotion_use_upper = 1
 
 " hjkl motions
-map <Leader>h <Plug>(easymotion-bd-el)
-map <Leader>j <Plug>(easymotion-bd-jk)
-let g:EasyMotion_startofline = 0 " keep cursor column when JK motionk
+map <Leader>h <Plug>(easymotion-linebackward)
+map <Leader>j <Plug>(easymotion-j)
+map <Leader>k <Plug>(easymotion-k)
+map <Leader>l <Plug>(easymotion-lineforward)
+
+" keep cursor column when JK motion
+let g:EasyMotion_startofline = 0
 
 " <Leader>f{char} to move to {char}
 map  <Leader>f <Plug>(easymotion-bd-f)
