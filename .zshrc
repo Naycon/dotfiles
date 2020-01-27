@@ -109,3 +109,6 @@ export FZF_DEFAULT_COMMAND='rg --files --follow --hidden'
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
+# Local .zshrc to support having machine local settings that should
+# not be exported to github
+[ -f ~/.localzshrc ] && source ~/.localzshrc
