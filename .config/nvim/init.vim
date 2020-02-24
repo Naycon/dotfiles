@@ -281,8 +281,10 @@ nnoremap <silent> gs  :<C-u>CocList outline<cr>
 " nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
 " Resume latest coc list
 " nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
-" ===================================
 
+" COC YANK command
+nnoremap <silent> <Leader>p  :<C-u>CocList -A --normal yank<cr>
+" ===================================
 
 " EASYMOTION CONFIG
 let g:EasyMotion_keys = 'FKLAHSDGWERUIOGTYPQNVBMCXJÖ'
