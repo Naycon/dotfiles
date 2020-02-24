@@ -185,7 +185,7 @@ inoremap <silent><expr> <TAB>
       \ coc#refresh()
 inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 " Make sure <Esc> closes completion window but does not leave insert mode
-inoremap <expr><Esc> pumvisible() ? "<C-e>" : "\<Esc>"
+" inoremap <expr><Esc> pumvisible() ? "<C-e>" : "\<Esc>"
 
 function! s:check_back_space() abort
   let col = col('.') - 1
