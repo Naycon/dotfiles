@@ -100,6 +100,10 @@ endfun
 autocmd BufWritePre * :%s/\s\+$//e
 " ===================================
 
+" SPEED IMPROVEMENTS
+set lazyredraw
+" ===================================
+
 
 " KEYBINDINGS
 :nnoremap <silent> <C-p> :Files<CR>
