@@ -23,6 +23,9 @@ Plug 'haya14busa/incsearch.vim'
 Plug 'haya14busa/incsearch-fuzzy.vim'
 Plug 'haya14busa/incsearch-easymotion.vim'
 Plug 'vim-scripts/SyntaxRange'
+Plug 'prettier/vim-prettier', {
+  \ 'do': 'yarn install',
+  \ 'for': ['typescript'] }
 
 " Color themes
 Plug 'morhetz/gruvbox'
@@ -396,6 +399,14 @@ endfunction
 
 noremap <silent><expr> <Leader>s incsearch#go(<SID>config_easyfuzzymotion())
 noremap <silent><expr> <Leader>/ incsearch#go(<SID>config_easyfuzzymotion())
+" ===================================
+
+
+" COC PRETTIER
+let g:prettier#autoformat = 1
+let g:prettier#autoformat_require_pragma = 0
+let g:prettier#autoformat_config_present = 1
+autocmd BufWritePre *.ts Prettier
 " ===================================
 
 
