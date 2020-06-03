@@ -1,5 +1,8 @@
 {
   "suggest.noselect": false,
   "typescript.preferences.importModuleSpecifier": "relative",
-  "javascript.preferences.importModuleSpecifier": "relative"
+  "javascript.preferences.importModuleSpecifier": "relative",
+  "coc.preferences.formatOnSaveFiletypes": ["ts"],
+  "java.import.maven.enabled": false,
+  "java.autobuild.enabled": false
 }
