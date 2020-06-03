@@ -108,7 +108,7 @@ alias gap="git add -p"
 alias config="/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME"
 
 # Fuzzy file finder config (nvim-plugin)
-export FZF_DEFAULT_COMMAND='rg --files --follow --hidden'
+export FZF_DEFAULT_COMMAND='rg --files --follow'
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
