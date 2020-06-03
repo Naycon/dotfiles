@@ -4,7 +4,8 @@ call plug#begin('~/.local/share/nvim/plugged')
 
 " Make sure you use single quotes
 
-Plug 'vim-airline/vim-airline'
+"Plug 'vim-airline/vim-airline'
+Plug 'itchyny/lightline.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
 Plug 'junegunn/fzf.vim'
 Plug 'scrooloose/nerdtree'
@@ -15,7 +16,6 @@ Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
 Plug 'airblade/vim-gitgutter'
 Plug 'kien/rainbow_parentheses.vim'
-Plug 'leafgarland/typescript-vim'
 Plug 'tomtom/tcomment_vim'
 Plug 'machakann/vim-highlightedyank'
 Plug 'easymotion/vim-easymotion'
@@ -26,6 +26,7 @@ Plug 'vim-scripts/SyntaxRange'
 
 " Color themes
 Plug 'morhetz/gruvbox'
+Plug 'flrnd/candid.vim'
 
 " Initialize plugin system
 call plug#end()
@@ -37,13 +38,21 @@ set termguicolors
 " ===================================
 
 
-" GRUVBOX CONFIG
-let g:gruvbox_contrast_dark="hard"
-" ===================================
-
-
 " SET COLOR SCHEME/THEME
-colorscheme gruvbox
+
+" --- gruvbox ---
+" let g:gruvbox_contrast_dark="hard"
+" colorscheme gruvbox
+
+" --- candid ---
+set background=dark
+syntax on
+let g:candid_color_store = {
+    \ "black": {"gui": "#151515", "cterm256": "0"},
+    \ "white": {"gui": "#f4f4f4", "cterm256": "255"},
+    \}
+colorscheme candid
+
 " ===================================
 
 
@@ -99,12 +108,69 @@ autocmd BufWritePre * :%s/\s\+$//e
 " ctrl + f to search all files
 :nnoremap <C-f> :BLines<CR>
 :nnoremap <C-g> :Rg<space>
+:nnoremap <Leader>g :Rg<space><c-r><c-w><CR>
 " ===================================
 
+" LIGHTLINE CONFIG
+set noshowmode
+" Always show tabline
+set showtabline=2
+
+function! GetShortFilename()
+  let f = fnamemodify(expand("%"), ":~:.")
+  return pathshorten(f)
+endfunction
+function! GetTabShortFilename(n)
+  return GetShortFilename()
+endfunction
+function! GetFullFilename()
+  return fnamemodify(expand("%"), ":~:.")
+endfunction
+function! GetTabFullFilename(n)
+  return GetFullFilename()
+endfunction
+
+let g:lightline = {
+      \ 'colorscheme': 'candid',
+      \ 'enable': {
+      \   'statusline': 1,
+      \   'tabline': 1,
+      \ },
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ],
+      \             [ 'readonly', 'filename', 'modified', 'gitbranch' ] ],
+      \   'right': [ [ 'lineinfo' ], [ 'filetype' ] ]
+      \ },
+      \ 'inactive': {
+      \   'left': [ [ 'filename' ] ],
+      \   'right': [ [ 'lineinfo' ], [ 'percent' ] ]
+      \ },
+      \ 'tabline': {
+      \   'left': [ [ 'tabs' ] ],
+      \   'right': []
+      \ },
+      \ 'tab': {
+      \   'active': [ 'tabnum', 'readonly', 'fullfilename', 'modified' ],
+      \   'inactive': [ 'tabnum', 'readonly', 'filename', 'modified' ]
+      \ },
+      \ 'component_function': {
+      \   'gitbranch': 'FugitiveHead',
+      \   'filename': 'GetShortFilename',
+      \   'fullfilename': 'GetFullFilename',
+      \ },
+      \ 'component': {
+      \   'lineinfo': '%3l:%-2c%<',
+      \ },
+      \ 'tab_component_function': {
+      \   'filename': 'GetTabShortFilename',
+      \   'fullfilename': 'GetTabFullFilename',
+      \ },
+    \ }
+" ===================================
 
 " AIRLINE CONFIG
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
+" let g:airline#extensions#tabline#enabled = 1
+" let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
 " ===================================
 
 
@@ -221,7 +287,7 @@ function! s:show_documentation()
 endfunction
 
 " Highlight symbol under cursor on CursorHold
-autocmd CursorHold * silent call CocActionAsync('highlight')
+" autocmd CursorHold * silent call CocActionAsync('highlight')
 
 " Remap for rename current word
 nmap <leader>rn <Plug>(coc-rename)
