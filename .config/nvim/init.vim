@@ -21,7 +21,8 @@ Plug 'easymotion/vim-easymotion'
 Plug 'haya14busa/incsearch.vim'
 Plug 'haya14busa/incsearch-fuzzy.vim'
 Plug 'haya14busa/incsearch-easymotion.vim'
-Plug 'vim-scripts/SyntaxRange'
+" Plug 'vim-scripts/SyntaxRange'
+Plug 'blindFS/vim-regionsyntax'
 Plug 'prettier/vim-prettier', {
   \ 'do': 'yarn install',
   \ 'for': ['typescript'] }
@@ -414,6 +415,19 @@ autocmd BufWritePre *.ts Prettier
 
 
 " SYNTAX RANGE (FOR ANGULAR TS FILES)
-au BufEnter *.ts :call SyntaxRange#Include('styles: \[\`\n', '\`\],', 'css', 'scss', 'sass')
-au BufEnter *.ts :call SyntaxRange#Include('template: \`', '\`,', 'html')
+" au BufEnter *.ts :call SyntaxRange#Include('styles: \[\`\n', '\`\],', 'css', 'scss', 'sass')
+" au BufEnter *.ts :call SyntaxRange#Include('template: \`', '\`,', 'html')
+let g:regionsyntax_map = {
+  \ 'typescript':
+  \ [{
+  \   'start' : 'styles:\s*\[[\s\n]*\`',
+  \   'ft' : 'css',
+  \   'end' : '\`'
+  \ },
+  \ {
+  \   'start' : 'template:\s*\n*\`',
+  \   'ft' : 'html',
+  \   'end' : '\`,'
+  \ }],
+  \}
 " ===================================
