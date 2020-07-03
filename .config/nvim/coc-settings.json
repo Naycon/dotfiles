@@ -4,5 +4,6 @@
   "javascript.preferences.importModuleSpecifier": "relative",
   "coc.preferences.formatOnSaveFiletypes": ["ts"],
   "java.import.maven.enabled": false,
-  "java.autobuild.enabled": false
+  "java.autobuild.enabled": false,
+  "yank.priority": 1
 }
