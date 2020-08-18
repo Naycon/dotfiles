@@ -25,7 +25,7 @@ Plug 'haya14busa/incsearch-easymotion.vim'
 Plug 'blindFS/vim-regionsyntax'
 Plug 'prettier/vim-prettier', {
   \ 'do': 'yarn install',
-  \ 'for': ['typescript'] }
+  \ 'for': ['typescript', 'javascript'] }
 
 " Color themes
 Plug 'morhetz/gruvbox'
@@ -99,6 +99,13 @@ endfun
 " to *.js to only strip whitespace on js files.
 autocmd BufWritePre * :%s/\s\+$//e
 " ===================================
+
+
+" ENABLE WILDMENU <TAB> COMPLETION
+set wildmenu
+set wildmode=longest:full,full
+" ===================================
+
 
 " SPEED IMPROVEMENTS
 set lazyredraw
