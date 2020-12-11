@@ -21,15 +21,16 @@ Plug 'easymotion/vim-easymotion'
 Plug 'haya14busa/incsearch.vim'
 Plug 'haya14busa/incsearch-fuzzy.vim'
 Plug 'haya14busa/incsearch-easymotion.vim'
-" Plug 'vim-scripts/SyntaxRange'
-Plug 'blindFS/vim-regionsyntax'
 Plug 'prettier/vim-prettier', {
   \ 'do': 'yarn install',
-  \ 'for': ['typescript', 'javascript'] }
+  \ 'for': ['javascript', 'typescript'] }
+" Plug 'vim-scripts/SyntaxRange'
+Plug 'blindFS/vim-regionsyntax'
 
 " Color themes
 Plug 'morhetz/gruvbox'
 Plug 'flrnd/candid.vim'
+Plug 'ayu-theme/ayu-vim'
 
 " Initialize plugin system
 call plug#end()
@@ -48,13 +49,19 @@ set termguicolors
 " colorscheme gruvbox
 
 " --- candid ---
-set background=dark
-syntax on
+" set background=dark
+" syntax on
 let g:candid_color_store = {
     \ "black": {"gui": "#151515", "cterm256": "0"},
     \ "white": {"gui": "#f4f4f4", "cterm256": "255"},
     \}
-colorscheme candid
+" colorscheme candid
+"
+" --- ayu ---
+" let ayucolor="light"  " for light version of theme
+" let ayucolor="mirage" " for mirage version of theme
+let ayucolor="dark"   " for dark version of theme
+colorscheme ayu
 
 " ===================================
 
@@ -417,6 +424,11 @@ noremap <silent><expr> <Leader>/ incsearch#go(<SID>config_easyfuzzymotion())
 let g:prettier#autoformat = 1
 let g:prettier#autoformat_require_pragma = 0
 let g:prettier#autoformat_config_present = 1
+" when running at every change you may want to disable quickfix
+" let g:prettier#quickfix_enabled = 0
+let g:prettier#config#tab_width = '2'
+
+" autocmd TextChanged,InsertLeave *.ts,*.tsx PrettierAsync
 autocmd BufWritePre *.ts Prettier
 " ===================================
 
@@ -424,17 +436,38 @@ autocmd BufWritePre *.ts Prettier
 " SYNTAX RANGE (FOR ANGULAR TS FILES)
 " au BufEnter *.ts :call SyntaxRange#Include('styles: \[\`\n', '\`\],', 'css', 'scss', 'sass')
 " au BufEnter *.ts :call SyntaxRange#Include('template: \`', '\`,', 'html')
-let g:regionsyntax_map = {
-  \ 'typescript':
-  \ [{
-  \   'start' : 'styles:\s*\[[\s\n]*\`',
-  \   'ft' : 'css',
-  \   'end' : '\`'
-  \ },
-  \ {
-  \   'start' : 'template:\s*\n*\`',
-  \   'ft' : 'html',
-  \   'end' : '\`,'
-  \ }],
-  \}
+" let g:regionsyntax_map = {
+"   \ 'typescript':
+"   \ [{
+"   \   'start' : 'template:\s*\n*\`',
+"   \   'ft' : 'html',
+"   \   'end' : '\`,'
+"   \ }],
+"   \}
+" let g:regionsyntax_map = {
+"   \ 'typescript':
+"   \ [{
+"   \   'start' : 'template: \`',
+"   \   'ft' : 'html',
+"   \   'end' : '\`,'
+"   \ }],
+"   \}
+  " \ {
+  " \   'start' : 'styles:\s*\[[\s\n]*\`',
+  " \   'ft' : 'css',
+  " \   'end' : '\`'
+  " \ },
+" let g:regionsyntax_map = {
+"   \ 'typescript':
+"   \ [{
+"   \   'start' : 'styles:\s*\[[\s\n]*\`',
+"   \   'ft' : 'css',
+"   \   'end' : '\`'
+"   \ },
+"   \ {
+"   \   'start' : 'template:\s*\n*\`',
+"   \   'ft' : 'html',
+"   \   'end' : '\`,'
+"   \ }],
+"   \}
 " ===================================
