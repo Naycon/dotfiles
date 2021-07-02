@@ -31,6 +31,7 @@ Plug 'blindFS/vim-regionsyntax'
 Plug 'morhetz/gruvbox'
 Plug 'flrnd/candid.vim'
 Plug 'ayu-theme/ayu-vim'
+Plug 'sonph/onehalf', { 'rtp': 'vim' }
 
 " Initialize plugin system
 call plug#end()
