@@ -1,5 +1,3 @@
-" Specify a directory for plugins
-" - Avoid using standard Vim directory names like 'plugin'
 call plug#begin('~/.local/share/nvim/plugged')
 
 " Make sure you use single quotes
@@ -10,12 +8,13 @@ Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
 Plug 'junegunn/fzf.vim'
 Plug 'scrooloose/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
-Plug 'sheerun/vim-polyglot'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
 Plug 'airblade/vim-gitgutter'
 Plug 'kien/rainbow_parentheses.vim'
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'nvim-treesitter/nvim-treesitter-angular'
 Plug 'tomtom/tcomment_vim'
 Plug 'easymotion/vim-easymotion'
 Plug 'haya14busa/incsearch.vim'
@@ -24,8 +23,6 @@ Plug 'haya14busa/incsearch-easymotion.vim'
 Plug 'prettier/vim-prettier', {
   \ 'do': 'yarn install',
   \ 'for': ['javascript', 'typescript'] }
-" Plug 'vim-scripts/SyntaxRange'
-Plug 'blindFS/vim-regionsyntax'
 
 " Color themes
 Plug 'morhetz/gruvbox'
@@ -131,6 +128,25 @@ set lazyredraw
 :nnoremap <C-f> :BLines<CR>
 :nnoremap <C-g> :Rg<space>
 :nnoremap <Leader>g :Rg<space><c-r><c-w><CR>
+
+
+" TREESITTER CONFIG
+" ===================================
+lua <<EOF
+require'nvim-treesitter.configs'.setup {
+  ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+  -- ignore_install = { "javascript" }, -- List of parsers to ignore installing
+  highlight = {
+    enable = true,              -- false will disable the whole extension
+    disable = { "c", "rust" },  -- list of language that will be disabled
+    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+    -- Using this option may slow down your editor, and you may see some duplicate highlights.
+    -- Instead of true it can also be a list of languages
+    additional_vim_regex_highlighting = false,
+  },
+}
+EOF
 " ===================================
 
 " LIGHTLINE CONFIG
@@ -431,44 +447,4 @@ let g:prettier#config#tab_width = '2'
 
 " autocmd TextChanged,InsertLeave *.ts,*.tsx PrettierAsync
 autocmd BufWritePre *.ts Prettier
-" ===================================
-
-
-" SYNTAX RANGE (FOR ANGULAR TS FILES)
-" au BufEnter *.ts :call SyntaxRange#Include('styles: \[\`\n', '\`\],', 'css', 'scss', 'sass')
-" au BufEnter *.ts :call SyntaxRange#Include('template: \`', '\`,', 'html')
-" let g:regionsyntax_map = {
-"   \ 'typescript':
-"   \ [{
-"   \   'start' : 'template:\s*\n*\`',
-"   \   'ft' : 'html',
-"   \   'end' : '\`,'
-"   \ }],
-"   \}
-" let g:regionsyntax_map = {
-"   \ 'typescript':
-"   \ [{
-"   \   'start' : 'template: \`',
-"   \   'ft' : 'html',
-"   \   'end' : '\`,'
-"   \ }],
-"   \}
-  " \ {
-  " \   'start' : 'styles:\s*\[[\s\n]*\`',
-  " \   'ft' : 'css',
-  " \   'end' : '\`'
-  " \ },
-" let g:regionsyntax_map = {
-"   \ 'typescript':
-"   \ [{
-"   \   'start' : 'styles:\s*\[[\s\n]*\`',
-"   \   'ft' : 'css',
-"   \   'end' : '\`'
-"   \ },
-"   \ {
-"   \   'start' : 'template:\s*\n*\`',
-"   \   'ft' : 'html',
-"   \   'end' : '\`,'
-"   \ }],
-"   \}
 " ===================================
