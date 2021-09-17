@@ -425,7 +425,8 @@ nmap <End> <Plug>(choosewin)
 
 
 " EASYMOTION CONFIG
-let g:EasyMotion_keys = 'FKLAHSDGWERUIOGTYPQNVBMCXJÖ'
+" ===================================
+let g:EasyMotion_keys = 'FKLAHSDGWERUIOGTYPQNVBMCXJ'
 
 " use upper case to display easymotion target labels (still allows use of
 " lower case keys)
