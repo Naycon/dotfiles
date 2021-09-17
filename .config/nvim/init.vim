@@ -23,6 +23,7 @@ Plug 'haya14busa/incsearch-easymotion.vim'
 Plug 'prettier/vim-prettier', {
   \ 'do': 'yarn install',
   \ 'for': ['javascript', 'typescript'] }
+Plug 't9md/vim-choosewin'
 
 " Color themes
 Plug 'morhetz/gruvbox'
@@ -389,6 +390,13 @@ nnoremap <silent> gs  :<C-u>CocList outline<cr>
 " COC YANK command
 nnoremap <silent> <Leader>p  :<C-u>CocList -A --normal yank<cr>
 " ===================================
+
+
+" CHOOSEWIN CONFIG
+" ===================================
+nmap <End> <Plug>(choosewin)
+" ===================================
+
 
 " EASYMOTION CONFIG
 let g:EasyMotion_keys = 'FKLAHSDGWERUIOGTYPQNVBMCXJÖ'
