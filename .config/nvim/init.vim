@@ -37,11 +37,13 @@ call plug#end()
 
 
 " ENABLE TRUECOLORS
+" ===================================
 set termguicolors
 " ===================================
 
 
 " SET COLOR SCHEME/THEME
+" ===================================
 
 " --- gruvbox ---
 " let g:gruvbox_contrast_dark="hard"
@@ -61,21 +63,23 @@ let g:candid_color_store = {
 " let ayucolor="mirage" " for mirage version of theme
 let ayucolor="dark"   " for dark version of theme
 colorscheme ayu
-
 " ===================================
 
 
 " REMAP LEADER
+" ===================================
 :let mapleader = "\<space>"
 " ===================================
 
 
 " SHOW LINE NUMBERS
+" ===================================
 set number
 " ===================================
 
 
 " SPLIT BEHAVIOUR
+" ===================================
 set splitbelow
 set splitright
 " ===================================
@@ -83,6 +87,7 @@ set splitright
 
 
 " SET TABS TO 2 SPACES
+" ===================================
 filetype plugin indent on
 " On pressing tab, insert 2 spaces
 set expandtab
@@ -95,6 +100,7 @@ set shiftwidth=2
 
 
 " TRIM WHITESPACE ON SAVE
+" ===================================
 function! <SID>StripTrailingWhitespaces()
     let l = line(".")
     let c = col(".")
@@ -108,27 +114,40 @@ autocmd BufWritePre * :%s/\s\+$//e
 
 
 " ENABLE WILDMENU <TAB> COMPLETION
+" ===================================
 set wildmenu
 set wildmode=longest:full,full
 " ===================================
 
 
 " SPEED IMPROVEMENTS
+" ===================================
 set lazyredraw
 " ===================================
 
 
 " KEYBINDINGS
+" ===================================
 :nnoremap <silent> <C-p> :Files<CR>
 :nnoremap <silent> <C-h> :NERDTreeToggle<CR>
+:nnoremap <silent> <C-f> :NERDTreeFind<CR>
 " esc leaves insert mode in terminal
 :tnoremap <Esc> <C-\><C-n>
 " gh switches between the last two buffers
 :nnoremap gh :b#<CR>
 " ctrl + f to search all files
-:nnoremap <C-f> :BLines<CR>
+" :nnoremap <C-f> :BLines<CR>
+" ctrl + g to search all files with ripgrep
 :nnoremap <C-g> :Rg<space>
+" space + g to search word under cursor in all files with ripgrep
 :nnoremap <Leader>g :Rg<space><c-r><c-w><CR>
+:xnoremap <Leader>g y:Rg<space><c-r>"<CR>
+" arrow keys to move between splits
+:nnoremap <Left> <c-w>h
+:nnoremap <Down> <c-w>j
+:nnoremap <Up> <c-w>k
+:nnoremap <Right> <c-w>l
+" ===================================
 
 
 " TREESITTER CONFIG
@@ -150,7 +169,9 @@ require'nvim-treesitter.configs'.setup {
 EOF
 " ===================================
 
+
 " LIGHTLINE CONFIG
+" ===================================
 set noshowmode
 " Always show tabline
 set showtabline=2
@@ -207,13 +228,16 @@ let g:lightline = {
     \ }
 " ===================================
 
+
 " AIRLINE CONFIG
+" ===================================
 " let g:airline#extensions#tabline#enabled = 1
 " let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
 " ===================================
 
 
 " BETTER RAINBOW PARENTHESIS
+" ===================================
 let g:rbpt_max = 16
 let g:rbpt_loadcmd_toggle = 0
 au VimEnter * RainbowParenthesesToggle
@@ -224,6 +248,7 @@ au Syntax * RainbowParenthesesLoadBraces
 
 
 " FZF CONFIG
+" ===================================
 " Reverse the layout to make the FZF list top-down
 let $FZF_DEFAULT_OPTS='--layout=default --border --margin=0,2'
 
@@ -263,6 +288,7 @@ endfunction
 
 
 " COC CONFIG
+" ===================================
 " if hidden is not set, TextEdit might fail.
 set hidden
 
@@ -430,6 +456,7 @@ nmap t <Plug>(easymotion-t2)
 
 
 " INCSEARCH EASYMOTION CONFIG
+" ===================================
 function! s:config_easyfuzzymotion(...) abort
   return extend(copy({
   \   'converters': [incsearch#config#fuzzy#converter()],
@@ -446,6 +473,7 @@ noremap <silent><expr> <Leader>/ incsearch#go(<SID>config_easyfuzzymotion())
 
 
 " COC PRETTIER
+" ===================================
 let g:prettier#autoformat = 1
 let g:prettier#autoformat_require_pragma = 0
 let g:prettier#autoformat_config_present = 1
