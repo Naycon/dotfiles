@@ -3,33 +3,50 @@ call plug#begin('~/.local/share/nvim/plugged')
 " Make sure you use single quotes
 
 "Plug 'vim-airline/vim-airline'
-Plug 'itchyny/lightline.vim'
+"Plug 'itchyny/lightline.vim'
+Plug 'hoob3rt/lualine.nvim'
+
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
 Plug 'junegunn/fzf.vim'
-Plug 'scrooloose/nerdtree'
-Plug 'Xuyuanp/nerdtree-git-plugin'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
+
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim'
+
+Plug 'kyazdani42/nvim-web-devicons' " for file icons
+Plug 'kyazdani42/nvim-tree.lua'
+
 Plug 'tpope/vim-fugitive'
+Plug 'lewis6991/gitsigns.nvim'
+
 Plug 'tpope/vim-surround'
-Plug 'airblade/vim-gitgutter'
-Plug 'kien/rainbow_parentheses.vim'
+
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'nvim-treesitter/nvim-treesitter-angular'
+
 Plug 'tomtom/tcomment_vim'
+
 Plug 'easymotion/vim-easymotion'
+
 Plug 'haya14busa/incsearch.vim'
 Plug 'haya14busa/incsearch-fuzzy.vim'
 Plug 'haya14busa/incsearch-easymotion.vim'
+
 Plug 'prettier/vim-prettier', {
   \ 'do': 'yarn install',
   \ 'for': ['javascript', 'typescript'] }
+
 Plug 't9md/vim-choosewin'
+
+Plug 'neovim/nvim-lspconfig'
+
+Plug 'ms-jpq/coq_nvim', {'branch': 'coq'}
 
 " Color themes
 Plug 'morhetz/gruvbox'
 Plug 'flrnd/candid.vim'
 Plug 'ayu-theme/ayu-vim'
 Plug 'sonph/onehalf', { 'rtp': 'vim' }
+Plug 'projekt0n/github-nvim-theme'
 
 " Initialize plugin system
 call plug#end()
@@ -52,17 +69,21 @@ set termguicolors
 " --- candid ---
 " set background=dark
 " syntax on
-let g:candid_color_store = {
-    \ "black": {"gui": "#151515", "cterm256": "0"},
-    \ "white": {"gui": "#f4f4f4", "cterm256": "255"},
-    \}
+" let g:candid_color_store = {
+"     \ "black": {"gui": "#151515", "cterm256": "0"},
+"     \ "white": {"gui": "#f4f4f4", "cterm256": "255"},
+"     \}
 " colorscheme candid
 "
 " --- ayu ---
 " let ayucolor="light"  " for light version of theme
 " let ayucolor="mirage" " for mirage version of theme
-let ayucolor="dark"   " for dark version of theme
-colorscheme ayu
+" let ayucolor="dark"   " for dark version of theme
+" colorscheme ayu
+"
+" --- github theme ---
+let g:github_dark_sidebar = 0
+colorscheme github_dark_default
 " ===================================
 
 
@@ -85,7 +106,6 @@ set splitright
 " ===================================
 
 
-
 " SET TABS TO 2 SPACES
 " ===================================
 filetype plugin indent on
@@ -96,6 +116,15 @@ set tabstop=2
 set softtabstop=2
 " when indenting with '>', use 2 spaces width
 set shiftwidth=2
+" ===================================
+
+
+" HIGHLIGHT ON YANK
+" ===================================
+augroup highlight_yank
+    autocmd!
+    au TextYankPost * silent! lua vim.highlight.on_yank { higroup='IncSearch', timeout=200 }
+augroup END
 " ===================================
 
 
@@ -110,6 +139,13 @@ endfun
 " Change * below if stripping is not desired on all file endings. E.g. set it
 " to *.js to only strip whitespace on js files.
 autocmd BufWritePre * :%s/\s\+$//e
+" ===================================
+
+
+" SET HIDDEN
+" ===================================
+" Needed to be able to change buffer without saving first.
+set hidden
 " ===================================
 
 
@@ -128,25 +164,40 @@ set lazyredraw
 
 " KEYBINDINGS
 " ===================================
-:nnoremap <silent> <C-p> :Files<CR>
-:nnoremap <silent> <C-h> :NERDTreeToggle<CR>
-:nnoremap <silent> <C-f> :NERDTreeFind<CR>
+:nnoremap <silent> <C-p> <cmd>Telescope find_files<cr>
 " esc leaves insert mode in terminal
 :tnoremap <Esc> <C-\><C-n>
 " gh switches between the last two buffers
 :nnoremap gh :b#<CR>
-" ctrl + f to search all files
-" :nnoremap <C-f> :BLines<CR>
-" ctrl + g to search all files with ripgrep
-:nnoremap <C-g> :Rg<space>
-" space + g to search word under cursor in all files with ripgrep
-:nnoremap <Leader>g :Rg<space><c-r><c-w><CR>
-:xnoremap <Leader>g y:Rg<space><c-r>"<CR>
+" gb to switch between open buffers
+:nnoremap gb <cmd>Telescope buffers<CR>
+" ctrl + g to search all files with Telescope
+:nnoremap <C-g> :Telescope grep_string search=
+" ctrl + f to live search all files with Telescope
+:nnoremap <C-f> :Telescope live_grep<CR>
+" space + g to search word under cursor in all files with Telescope
+:nnoremap <Leader>g <cmd>Telescope grep_string<cr>
+:xnoremap <Leader>g y:Telescope grep_string search=<c-r>"<CR>
 " arrow keys to move between splits
 :nnoremap <Left> <c-w>h
 :nnoremap <Down> <c-w>j
 :nnoremap <Up> <c-w>k
 :nnoremap <Right> <c-w>l
+" ===================================
+
+
+" NVIM_TREE CONFIG
+" ===================================
+let g:nvim_tree_width = 50
+:nnoremap <silent> <C-h> :NvimTreeToggle<CR>
+:nnoremap <silent> <C-j> :NvimTreeFindFile<CR>
+lua << EOF
+local tree_cb = require'nvim-tree.config'.nvim_tree_callback
+vim.g.nvim_tree_bindings = {
+  { key = "m", cb = tree_cb("rename") },
+  { key = "r", cb = tree_cb("refresh") }
+}
+EOF
 " ===================================
 
 
@@ -170,80 +221,65 @@ EOF
 " ===================================
 
 
-" LIGHTLINE CONFIG
+" GITSIGNS CONFIG
 " ===================================
-set noshowmode
-" Always show tabline
-set showtabline=2
-
-function! GetShortFilename()
-  let f = fnamemodify(expand("%"), ":~:.")
-  return pathshorten(f)
-endfunction
-function! GetTabShortFilename(n)
-  return GetShortFilename()
-endfunction
-function! GetFullFilename()
-  return fnamemodify(expand("%"), ":~:.")
-endfunction
-function! GetTabFullFilename(n)
-  return GetFullFilename()
-endfunction
-
-let g:lightline = {
-      \ 'colorscheme': 'candid',
-      \ 'enable': {
-      \   'statusline': 1,
-      \   'tabline': 1,
-      \ },
-      \ 'active': {
-      \   'left': [ [ 'mode', 'paste' ],
-      \             [ 'readonly', 'filename', 'modified', 'gitbranch' ] ],
-      \   'right': [ [ 'lineinfo' ], [ 'filetype' ] ]
-      \ },
-      \ 'inactive': {
-      \   'left': [ [ 'filename' ] ],
-      \   'right': [ [ 'lineinfo' ], [ 'percent' ] ]
-      \ },
-      \ 'tabline': {
-      \   'left': [ [ 'tabs' ] ],
-      \   'right': []
-      \ },
-      \ 'tab': {
-      \   'active': [ 'tabnum', 'readonly', 'fullfilename', 'modified' ],
-      \   'inactive': [ 'tabnum', 'readonly', 'filename', 'modified' ]
-      \ },
-      \ 'component_function': {
-      \   'gitbranch': 'FugitiveHead',
-      \   'filename': 'GetShortFilename',
-      \   'fullfilename': 'GetFullFilename',
-      \ },
-      \ 'component': {
-      \   'lineinfo': '%3l:%-2c%<',
-      \ },
-      \ 'tab_component_function': {
-      \   'filename': 'GetTabShortFilename',
-      \   'fullfilename': 'GetTabFullFilename',
-      \ },
-    \ }
+lua << EOF
+require('gitsigns').setup()
+EOF
 " ===================================
 
 
-" AIRLINE CONFIG
+" LUALINE CONFIG
 " ===================================
-" let g:airline#extensions#tabline#enabled = 1
-" let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
-" ===================================
-
-
-" BETTER RAINBOW PARENTHESIS
-" ===================================
-let g:rbpt_max = 16
-let g:rbpt_loadcmd_toggle = 0
-au VimEnter * RainbowParenthesesToggle
-au Syntax * RainbowParenthesesLoadRound
-au Syntax * RainbowParenthesesLoadSquare
-au Syntax * RainbowParenthesesLoadBraces
+lua << EOF
+require('lualine').setup {
+  options = {
+    theme = 'github',
+    extensions = { 'nvim-tree', 'fzf' },
+    component_separators = { '|', '|' },
+  },
+  sections = {
+    lualine_c = {
+      {
+        'filename',
+        file_status = false, -- displays file status (readonly status, modified status)
+        path = 1 -- 0 = just filename, 1 = relative path, 2 = absolute path
+      },
+      {
+        'bo:modified',
+        format = function(modified)
+          if modified == "false" then
+            return ""
+          else
+            return "[modified]"
+          end
+        end
+      }
+    },
+    lualine_x = {
+      {
+        'diagnostics',
+        -- table of diagnostic sources, available sources:
+        -- nvim_lsp, coc, ale, vim_lsp
+        sources = { 'nvim_lsp' },
+        -- displays diagnostics from defined severity
+        sections = {'error', 'warn', 'info', 'hint'},
+        -- all colors are in format #rrggbb
+        color_error = nil, -- changes diagnostic's error foreground color
+        color_warn = nil, -- changes diagnostic's warn foreground color
+        color_info = nil, -- Changes diagnostic's info foreground color
+        color_hint = nil, -- Changes diagnostic's hint foreground color
+        symbols = {error = 'E', warn = 'W', info = 'I', hint = 'H'}
+      }
+    },
+    lualine_y = {
+      {
+          'diff'
+      }
+    }
+  }
+}
+EOF
 " ===================================
 
 
@@ -282,140 +318,87 @@ function! FloatingFZF()
   " open the new window, floating, and enter to it
   call nvim_open_win(buf, v:true, opts)
 endfunction
-
-:nnoremap <silent> gb :Buffers<CR>
 " ===================================
 
 
-" COC CONFIG
+" COQ CONFIG
 " ===================================
-" if hidden is not set, TextEdit might fail.
-set hidden
-
-" Some servers have issues with backup files, see #649
-set nobackup
-set nowritebackup
-
-" Better display for messages
-set cmdheight=2
-
-" You will have bad experience for diagnostic messages when it's default 4000.
-set updatetime=300
-
-" don't give |ins-completion-menu| messages.
-set shortmess+=c
-
-" always show signcolumns
-set signcolumn=yes
-
-" Use tab for trigger completion with characters ahead and navigate.
-" Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
-inoremap <silent><expr> <TAB>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-" Make sure <Esc> closes completion window but does not leave insert mode
-" inoremap <expr><Esc> pumvisible() ? "<C-e>" : "\<Esc>"
-
-function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
-endfunction
-
-" Use <c-space> to trigger completion.
-inoremap <silent><expr> <c-space> coc#refresh()
-
-" Use <cr> to confirm completion, `<C-g>u` means break undo chain at current position.
-" Coc only does snippet and additional edit on confirm.
-inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-
-" Use `[c` and `]c` to navigate diagnostics
-nmap <silent> [c <Plug>(coc-diagnostic-prev)
-nmap <silent> ]c <Plug>(coc-diagnostic-next)
-
-" Remap keys for gotos
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
-
-" Use K to show documentation in preview window
-nnoremap <silent> K :call <SID>show_documentation()<CR>
-
-function! s:show_documentation()
-  if (index(['vim','help'], &filetype) >= 0)
-    execute 'h '.expand('<cword>')
-  else
-    call CocAction('doHover')
-  endif
-endfunction
-
-" Highlight symbol under cursor on CursorHold
-" autocmd CursorHold * silent call CocActionAsync('highlight')
-
-" Remap for rename current word
-nmap <leader>rn <Plug>(coc-rename)
-
-" Remap for format selected region
-xmap <leader>f  <Plug>(coc-format-selected)
-nmap <leader>f  <Plug>(coc-format-selected)
-
-augroup mygroup
-  autocmd!
-  " Setup formatexpr specified filetype(s).
-  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
-  " Update signature help on jump placeholder
-  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
-augroup end
-
-" Remap for do codeAction of selected region, ex: `<leader>aap` for current paragraph
-xmap <leader>a  <Plug>(coc-codeaction-selected)
-nmap <leader>a  <Plug>(coc-codeaction-selected)
-
-" Remap for do codeAction of current line
-nmap <leader>ac  <Plug>(coc-codeaction)
-" Fix autofix problem of current line
-nmap <leader>qf  <Plug>(coc-fix-current)
-
-" Use <tab> for select selections ranges, needs server support, like: coc-tsserver, coc-python
-nmap <silent> <TAB> <Plug>(coc-range-select)
-xmap <silent> <TAB> <Plug>(coc-range-select)
-xmap <silent> <S-TAB> <Plug>(coc-range-select-backword)
-
-" Use `:Format` to format current buffer
-command! -nargs=0 Format :call CocAction('format')
-
-" Use `:Fold` to fold current buffer
-command! -nargs=? Fold :call     CocAction('fold', <f-args>)
-
-" use `:OR` for organize import of current buffer
-command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
-
-" Add status line support, for integration with other plugin, checkout `:h coc-status`
-set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
-
-" Using CocList
-" Show all diagnostics
-" nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
-" Manage extensions
-" nnoremap <silent> <space>e  :<C-u>CocList extensions<cr>
-" Show commands
-" nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
-" Find symbol of current document
-nnoremap <silent> gs  :<C-u>CocList outline<cr>
-" Search workspace symbols
-" nnoremap <silent> ga  :<C-u>CocList -I symbols<cr>
-" Do default action for next item.
-" nnoremap <silent> <space>j  :<C-u>CocNext<CR>
-" Do default action for previous item.
-" nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
-" Resume latest coc list
-" nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
-
-" COC YANK command
-nnoremap <silent> <Leader>p  :<C-u>CocList -A --normal yank<cr>
+let g:coq_settings = {
+      \ 'auto_start': v:true,
+      \ 'keymap.jump_to_mark': '<C-n>'
+      \ }
+" " Make sure <Esc> closes completion window but does not leave insert mode
+inoremap <silent><expr><Esc> pumvisible() ? "<C-e>" : "\<Esc>"
+" autocmd VimEnter * COQnow [--shut-up]
+" lua << EOF
+" local coq = require "coq"
+"
+" vim.cmd([[COQnow]])
+" EOF
 " ===================================
+
+
+" LSP CONFIG
+" ===================================
+lua << EOF
+local nvim_lsp = require "lspconfig"
+
+local on_attach = function(client, bufnr)
+  local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
+  local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
+
+  -- Mappings.
+  local opts = { noremap=true, silent=true }
+
+  -- See `:help vim.lsp.*` for documentation on any of the below functions
+  buf_set_keymap('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+  buf_set_keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
+  buf_set_keymap('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
+  buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+  buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
+  -- buf_set_keymap('n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
+  -- buf_set_keymap('n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
+  -- buf_set_keymap('n', '<space>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
+  buf_set_keymap('n', '<Leader>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
+  buf_set_keymap('n', '<Leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+  buf_set_keymap('n', '<Leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+  buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
+  buf_set_keymap('n', '<Leader>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
+  buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
+  buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
+  -- buf_set_keymap('n', '<Leader>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
+  -- buf_set_keymap('n', '<Leader>f', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
+
+end
+
+nvim_lsp.tsserver.setup({
+  on_attach = on_attach,
+  flags = {
+    debounce_text_changes = 150,
+  },
+  init_options = {
+    hostInfo = "neovim",
+    preferences = {
+      quotePreference = "single",
+      importModuleSpecifierPreference = "relative",
+      allowTextChangesInNewFiles = true,
+      allowRenamteOfImportPath = true
+    }
+  },
+})
+-- Use a loop to conveniently call 'setup' on multiple servers and
+-- map buffer local keybindings when the language server attaches
+-- local servers = { 'tsserver' }
+-- for _, lsp in ipairs(servers) do
+--   nvim_lsp[lsp].setup({
+--     on_attach = on_attach,
+--     flags = {
+--       debounce_text_changes = 150,
+--     }
+--   })
+-- end
+EOF
+" " ===================================
 
 
 " CHOOSEWIN CONFIG
@@ -472,16 +455,16 @@ noremap <silent><expr> <Leader>s incsearch#go(<SID>config_easyfuzzymotion())
 noremap <silent><expr> <Leader>/ incsearch#go(<SID>config_easyfuzzymotion())
 " ===================================
 
-
-" COC PRETTIER
-" ===================================
-let g:prettier#autoformat = 1
-let g:prettier#autoformat_require_pragma = 0
-let g:prettier#autoformat_config_present = 1
-" when running at every change you may want to disable quickfix
-" let g:prettier#quickfix_enabled = 0
-let g:prettier#config#tab_width = '2'
-
-" autocmd TextChanged,InsertLeave *.ts,*.tsx PrettierAsync
-autocmd BufWritePre *.ts Prettier
-" ===================================
+"
+" " COC PRETTIER
+" " ===================================
+" let g:prettier#autoformat = 1
+" let g:prettier#autoformat_require_pragma = 0
+" let g:prettier#autoformat_config_present = 1
+" " when running at every change you may want to disable quickfix
+" " let g:prettier#quickfix_enabled = 0
+" let g:prettier#config#tab_width = '2'
+"
+" " autocmd TextChanged,InsertLeave *.ts,*.tsx PrettierAsync
+" autocmd BufWritePre *.ts Prettier
+" " ===================================
