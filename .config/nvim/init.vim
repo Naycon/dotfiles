@@ -329,6 +329,7 @@ let g:coq_settings = {
       \ }
 " " Make sure <Esc> closes completion window but does not leave insert mode
 inoremap <silent><expr><Esc> pumvisible() ? "<C-e>" : "\<Esc>"
+
 " autocmd VimEnter * COQnow [--shut-up]
 " lua << EOF
 " local coq = require "coq"
@@ -342,6 +343,7 @@ inoremap <silent><expr><Esc> pumvisible() ? "<C-e>" : "\<Esc>"
 " ===================================
 lua << EOF
 local nvim_lsp = require "lspconfig"
+local coq = require "coq"
 
 local on_attach = function(client, bufnr)
   local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
@@ -386,6 +388,18 @@ nvim_lsp.tsserver.setup({
     }
   },
 })
+nvim_lsp.angularls.setup(coq.lsp_ensure_capabilities({
+  on_attach = on_attach,
+}))
+nvim_lsp.cssls.setup(coq.lsp_ensure_capabilities({
+  on_attach = on_attach,
+}))
+nvim_lsp.html.setup(coq.lsp_ensure_capabilities({
+  on_attach = on_attach,
+}))
+nvim_lsp.jsonls.setup(coq.lsp_ensure_capabilities({
+  on_attach = on_attach,
+}))
 -- Use a loop to conveniently call 'setup' on multiple servers and
 -- map buffer local keybindings when the language server attaches
 -- local servers = { 'tsserver' }
