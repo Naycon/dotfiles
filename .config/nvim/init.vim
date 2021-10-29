@@ -25,15 +25,14 @@ Plug 'nvim-treesitter/nvim-treesitter-angular'
 
 Plug 'tomtom/tcomment_vim'
 
-Plug 'easymotion/vim-easymotion'
+Plug 'phaazon/hop.nvim'
 
 Plug 'haya14busa/incsearch.vim'
 Plug 'haya14busa/incsearch-fuzzy.vim'
 Plug 'haya14busa/incsearch-easymotion.vim'
 
-Plug 'prettier/vim-prettier', {
-  \ 'do': 'yarn install',
-  \ 'for': ['javascript', 'typescript'] }
+Plug 'mhartington/formatter.nvim'
+" Plug 'mfussenegger/nvim-lint'
 
 Plug 't9md/vim-choosewin'
 
@@ -186,16 +185,23 @@ set lazyredraw
 " ===================================
 
 
-" NVIM_TREE CONFIG
+" NVIM-TREE CONFIG
 " ===================================
-let g:nvim_tree_width = 50
+" let g:nvim_tree_width = 50
 :nnoremap <silent> <C-h> :NvimTreeToggle<CR>
 :nnoremap <silent> <C-j> :NvimTreeFindFile<CR>
 lua << EOF
 local tree_cb = require'nvim-tree.config'.nvim_tree_callback
-vim.g.nvim_tree_bindings = {
-  { key = "m", cb = tree_cb("rename") },
-  { key = "r", cb = tree_cb("refresh") }
+require'nvim-tree'.setup {
+  view = {
+    width = 50,
+    mappings = {
+      list = {
+        { key = "m", cb = tree_cb("rename") },
+        { key = "r", cb = tree_cb("refresh") }
+      }
+    }
+  },
 }
 EOF
 " ===================================
@@ -325,7 +331,7 @@ endfunction
 " ===================================
 let g:coq_settings = {
       \ 'auto_start': v:true,
-      \ 'keymap.jump_to_mark': '<C-n>'
+      \ 'keymap.jump_to_mark': '<C-n>',
       \ }
 " " Make sure <Esc> closes completion window but does not leave insert mode
 inoremap <silent><expr><Esc> pumvisible() ? "<C-e>" : "\<Esc>"
@@ -388,9 +394,7 @@ nvim_lsp.tsserver.setup({
     }
   },
 })
-nvim_lsp.angularls.setup(coq.lsp_ensure_capabilities({
-  on_attach = on_attach,
-}))
+nvim_lsp.angularls.setup{}
 nvim_lsp.cssls.setup(coq.lsp_ensure_capabilities({
   on_attach = on_attach,
 }))
@@ -400,6 +404,7 @@ nvim_lsp.html.setup(coq.lsp_ensure_capabilities({
 nvim_lsp.jsonls.setup(coq.lsp_ensure_capabilities({
   on_attach = on_attach,
 }))
+nvim_lsp.eslint.setup{}
 -- Use a loop to conveniently call 'setup' on multiple servers and
 -- map buffer local keybindings when the language server attaches
 -- local servers = { 'tsserver' }
@@ -421,64 +426,51 @@ nmap <End> <Plug>(choosewin)
 " ===================================
 
 
-" EASYMOTION CONFIG
+" HOP CONFIG
 " ===================================
-let g:EasyMotion_keys = 'FKLAHSDGWERUIOGTYPQNVBMCXJ'
 
-" use upper case to display easymotion target labels (still allows use of
-" lower case keys)
-let g:EasyMotion_use_upper = 1
+lua << EOF
+-- require'hop'.setup { keys = 'FKLAHSDGWERUIOGTYPQNVBMCXJ' }
+require'hop'.setup()
+EOF
 
-" hjkl motions
-map <Leader>h <Plug>(easymotion-linebackward)
-map <Leader>j <Plug>(easymotion-j)
-map <Leader>k <Plug>(easymotion-k)
-map <Leader>l <Plug>(easymotion-lineforward)
-
-" keep cursor column when JK motion
-let g:EasyMotion_startofline = 0
-
-" <Leader>f{char} to move to {char}
-map  <Leader>f <Plug>(easymotion-bd-f)
-nmap <Leader>f <Plug>(easymotion-overwin-f)
-
-" Move to word
-map  <Leader>w <Plug>(easymotion-bd-w)
-nmap <Leader>w <Plug>(easymotion-overwin-w)
-
-" Two character search motion
-map s <Plug>(easymotion-s2)
-nmap s <Plug>(easymotion-overwin-f2)
-nmap t <Plug>(easymotion-t2)
+" map <Leader>h <Plug>(easymotion-linebackward)
+map <Leader>j :HopLineAC<CR>
+map <Leader>k :HopLineBC<CR>
+" map <Leader>l <Plug>(easymotion-lineforward)
+map  <Leader>w :HopWord<CR>
+nmap <Leader>w :HopWord<CR>
+map s :HopChar2<CR>
 " ===================================
 
 
-" INCSEARCH EASYMOTION CONFIG
+" FORMATTER CONFIG
 " ===================================
-function! s:config_easyfuzzymotion(...) abort
-  return extend(copy({
-  \   'converters': [incsearch#config#fuzzy#converter()],
-  \   'modules': [incsearch#config#easymotion#module()],
-  \   'keymap': {"\<CR>": '<Over>(easymotion)'},
-  \   'is_expr': 0,
-  \   'is_stay': 1
-  \ }), get(a:, 1, {}))
-endfunction
+" Prettierd
+lua << EOF
 
-noremap <silent><expr> <Leader>s incsearch#go(<SID>config_easyfuzzymotion())
-noremap <silent><expr> <Leader>/ incsearch#go(<SID>config_easyfuzzymotion())
+require('formatter').setup({
+  logging = false,
+  filetype = {
+    typescript = {
+        -- prettierd
+       function()
+          return {
+            exe = "prettierd",
+            args = {vim.api.nvim_buf_get_name(0)},
+            stdin = true
+          }
+        end
+    },
+  }
+})
+
+vim.api.nvim_exec([[
+  augroup FormatAutogroup
+    autocmd!
+    autocmd BufWritePost *.ts,*.js FormatWrite
+  augroup END
+]], true)
+EOF
 " ===================================
 
-"
-" " COC PRETTIER
-" " ===================================
-" let g:prettier#autoformat = 1
-" let g:prettier#autoformat_require_pragma = 0
-" let g:prettier#autoformat_config_present = 1
-" " when running at every change you may want to disable quickfix
-" " let g:prettier#quickfix_enabled = 0
-" let g:prettier#config#tab_width = '2'
-"
-" " autocmd TextChanged,InsertLeave *.ts,*.tsx PrettierAsync
-" autocmd BufWritePre *.ts Prettier
-" " ===================================
