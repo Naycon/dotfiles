@@ -28,11 +28,8 @@ Plug 'tomtom/tcomment_vim'
 Plug 'phaazon/hop.nvim'
 
 Plug 'haya14busa/incsearch.vim'
-Plug 'haya14busa/incsearch-fuzzy.vim'
-Plug 'haya14busa/incsearch-easymotion.vim'
 
 Plug 'mhartington/formatter.nvim'
-" Plug 'mfussenegger/nvim-lint'
 
 Plug 't9md/vim-choosewin'
 
@@ -168,8 +165,54 @@ set lazyredraw
 :tnoremap <Esc> <C-\><C-n>
 " gh switches between the last two buffers
 :nnoremap gh :b#<CR>
+" arrow keys to move between splits
+:nnoremap <Left> <c-w>h
+:nnoremap <Down> <c-w>j
+:nnoremap <Up> <c-w>k
+:nnoremap <Right> <c-w>l
+" ===================================
+
+
+" TELESCOPE
+" ===================================
+lua << EOF
+local center_dropdown = {
+  path_display = { "smart" },
+  theme = "dropdown",
+  layout_config = {
+    center = {
+      width = 120,
+    },
+  },
+}
+local cursor = {
+  layout_strategy = "cursor",
+  sorting_strategy = "ascending",
+  layout_config = {
+    cursor = {
+      width = 60,
+      height = 8,
+    }
+  }
+}
+require('telescope').setup({
+  pickers = {
+    lsp_references = center_dropdown,
+    lsp_definitions = vim.tbl_extend("error", center_dropdown, {
+      jump_type = "never",
+    }),
+    lsp_code_actions = cursor,
+    lsp_range_code_actions = cursor,
+    lsp_document_diagnostics = center_dropdown,
+    lsp_document_symbols = center_dropdown,
+    lsp_dynamic_workspace_symbols = center_dropdown,
+  },
+})
+EOF
 " gb to switch between open buffers
 :nnoremap gb <cmd>Telescope buffers<CR>
+" gc to see command history
+:nnoremap gc <cmd>Telescope command_history<CR>
 " ctrl + g to search all files with Telescope
 :nnoremap <C-g> :Telescope grep_string search=
 " ctrl + f to live search all files with Telescope
@@ -177,11 +220,42 @@ set lazyredraw
 " space + g to search word under cursor in all files with Telescope
 :nnoremap <Leader>g <cmd>Telescope grep_string<cr>
 :xnoremap <Leader>g y:Telescope grep_string search=<c-r>"<CR>
-" arrow keys to move between splits
-:nnoremap <Left> <c-w>h
-:nnoremap <Down> <c-w>j
-:nnoremap <Up> <c-w>k
-:nnoremap <Right> <c-w>l
+"
+" " Preview definition
+:nnoremap <silent> gd <cmd>Telescope lsp_definitions<CR>
+" " Preview references
+:nnoremap <silent> gr <cmd>Telescope lsp_references<CR>
+" " Code actions under cursor
+:nnoremap <silent><leader>ca <cmd>Telescope lsp_code_actions<CR>
+vnoremap <silent><leader>ca :<C-U>Telescope lsp_range_code_actions<CR>
+" " Show diagnostics
+nnoremap <silent><leader>cd <cmd>Telescope lsp_document_diagnostics<CR>
+" " Document symbols
+nnoremap <silent>gs <cmd>Telescope lsp_document_symbols<CR>
+" " Workspace symbols
+nnoremap <silent>gws <cmd>Telescope lsp_dynamic_workspace_symbols<CR>
+" nnoremap <silent> gp <cmd>lua require'lspsaga.provider'.preview_definition()<CR>
+" " Code actions
+" nnoremap <silent><leader>ca <cmd>lua require('lspsaga.codeaction').code_action()<CR>
+" vnoremap <silent><leader>ca :<C-U>lua require('lspsaga.codeaction').range_code_action()<CR>
+" " Hover doc
+" nnoremap <silent> K <cmd>lua require('lspsaga.hover').render_hover_doc()<CR>
+" " Signature help
+" nnoremap <silent> gs <cmd>lua require('lspsaga.signaturehelp').signature_help()<CR>
+" " Rename
+" nnoremap <silent><leader>rn <cmd>lua require('lspsaga.rename').rename()<CR>
+" " Show diagnostics
+" nnoremap <silent><leader>cd <cmd>lua require'lspsaga.diagnostic'.show_line_diagnostics()<CR>
+" " Jump to diagnostics
+" nnoremap <silent><leader>cn <cmd>lua require'lspsaga.diagnostic'.navigate("next")()<CR>
+" nnoremap <silent><leader>cp <cmd>lua require'lspsaga.diagnostic'.navigate("prev")()<CR>
+" " Show terminal
+" nnoremap <silent> gt <cmd>lua require('lspsaga.floaterm').open_float_terminal()<CR>
+" " Scroll down hover doc or scroll in definition preview
+" nnoremap <silent><leader>d <cmd>lua require('lspsaga.action').smart_scroll_with_saga(1)<CR>
+" " Scroll up hover doc
+" nnoremap <silent><leader>u <cmd>lua require('lspsaga.action').smart_scroll_with_saga(-1)<CR>
+"
 " ===================================
 
 
@@ -345,6 +419,31 @@ inoremap <silent><expr><Esc> pumvisible() ? "<C-e>" : "\<Esc>"
 " ===================================
 
 
+" NAVIGATOR CONFIG
+" ===================================
+" lua <<EOF
+" require'navigator'.setup({
+"   transparency = 100,
+"   lsp = {
+"     disable_lsp = {"denols"},
+"     tsserver = {
+"       init_options = {
+"         hostInfo = "neovim",
+"         preferences = {
+"           quotePreference = "single",
+"           importModuleSpecifierPreference = "relative",
+"           allowTextChangesInNewFiles = true,
+"           allowRenameOfImportPath = true
+"         }
+"       },
+"     },
+"     servers = {'eslint'}
+"   },
+" })
+" EOF
+" ===================================
+
+
 " LSP CONFIG
 " ===================================
 lua << EOF
@@ -359,27 +458,31 @@ local on_attach = function(client, bufnr)
   local opts = { noremap=true, silent=true }
 
   -- See `:help vim.lsp.*` for documentation on any of the below functions
-  buf_set_keymap('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
-  buf_set_keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
+
+  -- buf_set_keymap('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+  -- buf_set_keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
   buf_set_keymap('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
-  buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-  buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
+  -- buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+  buf_set_keymap('n', '<Leader>cs', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
+
   -- buf_set_keymap('n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
   -- buf_set_keymap('n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
   -- buf_set_keymap('n', '<space>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
-  buf_set_keymap('n', '<Leader>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
+
+  -- buf_set_keymap('n', '<Leader>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
   buf_set_keymap('n', '<Leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-  buf_set_keymap('n', '<Leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-  buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-  buf_set_keymap('n', '<Leader>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
-  buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
-  buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
+  -- buf_set_keymap('n', '<Leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+  -- buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
+  -- buf_set_keymap('n', '<Leader>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
+  -- buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
+  -- buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
+
   -- buf_set_keymap('n', '<Leader>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
   -- buf_set_keymap('n', '<Leader>f', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
 
 end
 
-nvim_lsp.tsserver.setup({
+nvim_lsp.tsserver.setup(coq.lsp_ensure_capabilities({
   on_attach = on_attach,
   flags = {
     debounce_text_changes = 150,
@@ -390,34 +493,58 @@ nvim_lsp.tsserver.setup({
       quotePreference = "single",
       importModuleSpecifierPreference = "relative",
       allowTextChangesInNewFiles = true,
-      allowRenamteOfImportPath = true
+      allowRenameOfImportPath = true
     }
   },
-})
+}))
 nvim_lsp.angularls.setup{}
 nvim_lsp.cssls.setup(coq.lsp_ensure_capabilities({
-  on_attach = on_attach,
+  -- on_attach = on_attach,
 }))
 nvim_lsp.html.setup(coq.lsp_ensure_capabilities({
-  on_attach = on_attach,
+  -- on_attach = on_attach,
 }))
 nvim_lsp.jsonls.setup(coq.lsp_ensure_capabilities({
-  on_attach = on_attach,
+  -- on_attach = on_attach,
 }))
 nvim_lsp.eslint.setup{}
--- Use a loop to conveniently call 'setup' on multiple servers and
--- map buffer local keybindings when the language server attaches
--- local servers = { 'tsserver' }
--- for _, lsp in ipairs(servers) do
---   nvim_lsp[lsp].setup({
---     on_attach = on_attach,
---     flags = {
---       debounce_text_changes = 150,
---     }
---   })
--- end
 EOF
-" " ===================================
+" ===================================
+
+
+" LSPSAGA (buggy, disabled)
+" ===================================
+" lua << EOF
+" local saga = require 'lspsaga'
+" saga.init_lsp_saga()
+" EOF
+"
+" " Show definition and references
+" nnoremap <silent> gd <cmd>lua require'lspsaga.provider'.lsp_finder()<CR>
+" " Preview definition
+" nnoremap <silent> gp <cmd>lua require'lspsaga.provider'.preview_definition()<CR>
+" " Code actions
+" nnoremap <silent><leader>ca <cmd>lua require('lspsaga.codeaction').code_action()<CR>
+" vnoremap <silent><leader>ca :<C-U>lua require('lspsaga.codeaction').range_code_action()<CR>
+" " Hover doc
+" nnoremap <silent> K <cmd>lua require('lspsaga.hover').render_hover_doc()<CR>
+" " Signature help
+" nnoremap <silent> gs <cmd>lua require('lspsaga.signaturehelp').signature_help()<CR>
+" " Rename
+" nnoremap <silent><leader>rn <cmd>lua require('lspsaga.rename').rename()<CR>
+" " Show diagnostics
+" nnoremap <silent><leader>cd <cmd>lua require'lspsaga.diagnostic'.show_line_diagnostics()<CR>
+" " Jump to diagnostics
+" nnoremap <silent><leader>cn <cmd>lua require'lspsaga.diagnostic'.navigate("next")()<CR>
+" nnoremap <silent><leader>cp <cmd>lua require'lspsaga.diagnostic'.navigate("prev")()<CR>
+" " Show terminal
+" nnoremap <silent> gt <cmd>lua require('lspsaga.floaterm').open_float_terminal()<CR>
+" " Scroll down hover doc or scroll in definition preview
+" nnoremap <silent><leader>d <cmd>lua require('lspsaga.action').smart_scroll_with_saga(1)<CR>
+" " Scroll up hover doc
+" nnoremap <silent><leader>u <cmd>lua require('lspsaga.action').smart_scroll_with_saga(-1)<CR>
+"
+" ===================================
 
 
 " CHOOSEWIN CONFIG
