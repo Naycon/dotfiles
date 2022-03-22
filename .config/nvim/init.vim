@@ -497,7 +497,7 @@ nvim_lsp.tsserver.setup(coq.lsp_ensure_capabilities({
     }
   },
 }))
-nvim_lsp.angularls.setup{}
+-- nvim_lsp.angularls.setup{}
 nvim_lsp.cssls.setup(coq.lsp_ensure_capabilities({
   -- on_attach = on_attach,
 }))
