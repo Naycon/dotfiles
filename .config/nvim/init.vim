@@ -11,6 +11,7 @@ Plug 'junegunn/fzf.vim'
 
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
+Plug 'nvim-telescope/telescope-ui-select.nvim'
 
 Plug 'kyazdani42/nvim-web-devicons' " for file icons
 Plug 'kyazdani42/nvim-tree.lua'
@@ -36,6 +37,7 @@ Plug 't9md/vim-choosewin'
 Plug 'neovim/nvim-lspconfig'
 
 Plug 'ms-jpq/coq_nvim', {'branch': 'coq'}
+Plug 'ms-jpq/coq.thirdparty', {'branch': '3p'}
 
 " Color themes
 Plug 'morhetz/gruvbox'
@@ -43,6 +45,8 @@ Plug 'flrnd/candid.vim'
 Plug 'ayu-theme/ayu-vim'
 Plug 'sonph/onehalf', { 'rtp': 'vim' }
 Plug 'projekt0n/github-nvim-theme'
+
+Plug 'github/copilot.vim'
 
 " Initialize plugin system
 call plug#end()
@@ -201,13 +205,33 @@ require('telescope').setup({
     lsp_definitions = vim.tbl_extend("error", center_dropdown, {
       jump_type = "never",
     }),
-    lsp_code_actions = cursor,
-    lsp_range_code_actions = cursor,
     lsp_document_diagnostics = center_dropdown,
     lsp_document_symbols = center_dropdown,
     lsp_dynamic_workspace_symbols = center_dropdown,
   },
+  extensions = {
+    ["ui-select"] = {
+      require("telescope.themes").get_cursor {
+        -- even more opts
+      }
+
+      -- pseudo code / specification for writing custom displays, like the one
+      -- for "codeactions"
+      -- specific_opts = {
+      --   [kind] = {
+      --     make_indexed = function(items) -> indexed_items, width,
+      --     make_displayer = function(widths) -> displayer
+      --     make_display = function(displayer) -> function(e)
+      --     make_ordinal = function(e) -> string
+      --   },
+      --   -- for example to disable the custom builtin "codeactions" display
+      --      do the following
+      --   codeactions = false,
+      -- }
+    }
+  }
 })
+require("telescope").load_extension("ui-select")
 EOF
 " gb to switch between open buffers
 :nnoremap gb <cmd>Telescope buffers<CR>
@@ -226,14 +250,14 @@ EOF
 " " Preview references
 :nnoremap <silent> gr <cmd>Telescope lsp_references<CR>
 " " Code actions under cursor
-:nnoremap <silent><leader>ca <cmd>Telescope lsp_code_actions<CR>
-vnoremap <silent><leader>ca :<C-U>Telescope lsp_range_code_actions<CR>
+" :nnoremap <silent><leader>ca <cmd>Telescope lsp_code_actions<CR>
+" :vnoremap <silent><leader>ca :<C-U>Telescope lsp_range_code_actions<CR>
 " " Show diagnostics
-nnoremap <silent><leader>cd <cmd>Telescope lsp_document_diagnostics<CR>
+:nnoremap <silent><leader>cd <cmd>Telescope lsp_document_diagnostics<CR>
 " " Document symbols
-nnoremap <silent>gs <cmd>Telescope lsp_document_symbols<CR>
+:nnoremap <silent>gs <cmd>Telescope lsp_document_symbols<CR>
 " " Workspace symbols
-nnoremap <silent>gws <cmd>Telescope lsp_dynamic_workspace_symbols<CR>
+:nnoremap <silent>gws <cmd>Telescope lsp_dynamic_workspace_symbols<CR>
 " nnoremap <silent> gp <cmd>lua require'lspsaga.provider'.preview_definition()<CR>
 " " Code actions
 " nnoremap <silent><leader>ca <cmd>lua require('lspsaga.codeaction').code_action()<CR>
@@ -285,7 +309,7 @@ EOF
 " ===================================
 lua <<EOF
 require'nvim-treesitter.configs'.setup {
-  ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+  ensure_installed = { "css", "dart", "dockerfile", "html", "java", "javascript", "jsdoc", "json", "python", "scss", "tsx", "typescript", "vim", "yaml" }, -- "all" or a list of languages
   ignore_install = { "vala", "latex" }, -- List of parsers to ignore installing
   highlight = {
     enable = true,              -- false will disable the whole extension
@@ -410,6 +434,11 @@ let g:coq_settings = {
 " " Make sure <Esc> closes completion window but does not leave insert mode
 inoremap <silent><expr><Esc> pumvisible() ? "<C-e>" : "\<Esc>"
 
+lua << EOF
+require("coq_3p") {
+  { src = "copilot", short_name = "COP", accept_key = "<Right>" },
+}
+EOF
 " autocmd VimEnter * COQnow [--shut-up]
 " lua << EOF
 " local coq = require "coq"
@@ -464,6 +493,7 @@ local on_attach = function(client, bufnr)
   buf_set_keymap('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
   -- buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
   buf_set_keymap('n', '<Leader>cs', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
+  buf_set_keymap('n', '<Leader>h', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
 
   -- buf_set_keymap('n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
   -- buf_set_keymap('n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
@@ -471,7 +501,7 @@ local on_attach = function(client, bufnr)
 
   -- buf_set_keymap('n', '<Leader>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
   buf_set_keymap('n', '<Leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-  -- buf_set_keymap('n', '<Leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+  buf_set_keymap('n', '<Leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
   -- buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
   -- buf_set_keymap('n', '<Leader>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
   -- buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
@@ -610,4 +640,5 @@ vim.api.nvim_exec([[
 ]], true)
 EOF
 " ===================================
+
 
