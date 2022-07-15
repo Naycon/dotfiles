@@ -108,10 +108,21 @@ alias gs="git status"
 alias gap="git add -p"
 alias config="/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME"
 
+# Use nvim as editor if available
+if [ -x "$(command -v nvim)" ]; then
+  export VISUAL=nvim
+  export EDITOR="$VISUAL"
+fi
+
 # Fuzzy file finder config (nvim-plugin)
 export FZF_DEFAULT_COMMAND='rg --files --follow'
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# Initiate jump to use j to jump to frequently used folders
+if [ -x "$(command -v jump)" ]; then
+  eval "$(jump shell)"
+fi
 
 # Local .zshrc to support having machine local settings that should
 # not be exported to github
