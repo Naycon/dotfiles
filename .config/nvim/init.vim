@@ -10,7 +10,7 @@ Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
 Plug 'junegunn/fzf.vim'
 
 Plug 'nvim-lua/plenary.nvim'
-Plug 'nvim-telescope/telescope.nvim'
+Plug 'nvim-telescope/telescope.nvim', { 'branch': '0.1.x' }
 Plug 'nvim-telescope/telescope-ui-select.nvim'
 
 Plug 'kyazdani42/nvim-web-devicons' " for file icons
@@ -22,7 +22,8 @@ Plug 'lewis6991/gitsigns.nvim'
 Plug 'tpope/vim-surround'
 
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-Plug 'nvim-treesitter/nvim-treesitter-angular'
+"Plug 'nvim-treesitter/nvim-treesitter-angular'
+Plug 'nvim-treesitter/nvim-treesitter-context'
 
 Plug 'tomtom/tcomment_vim'
 
@@ -46,7 +47,7 @@ Plug 'ayu-theme/ayu-vim'
 Plug 'sonph/onehalf', { 'rtp': 'vim' }
 Plug 'projekt0n/github-nvim-theme'
 
-Plug 'github/copilot.vim'
+" Plug 'github/copilot.vim'
 
 " Initialize plugin system
 call plug#end()
@@ -200,6 +201,13 @@ local cursor = {
   }
 }
 require('telescope').setup({
+  defaults = {
+    path_display = function(opts, path)
+      local tail = require("telescope.utils").path_tail(path)
+      local smartPath = require("telescope.utils").path_smart(path)
+      return string.format("%s (%s)", tail, smartPath)
+    end,
+  },
   pickers = {
     lsp_references = center_dropdown,
     lsp_definitions = vim.tbl_extend("error", center_dropdown, {
@@ -240,7 +248,8 @@ EOF
 " ctrl + g to search all files with Telescope
 :nnoremap <C-g> :Telescope grep_string search=
 " ctrl + f to live search all files with Telescope
-:nnoremap <C-f> :Telescope live_grep<CR>
+:nnoremap <C-f> :Telescope current_buffer_fuzzy_find<CR>
+:nnoremap <C-a> :Telescope live_grep<CR>
 " space + g to search word under cursor in all files with Telescope
 :nnoremap <Leader>g <cmd>Telescope grep_string<cr>
 :xnoremap <Leader>g y:Telescope grep_string search=<c-r>"<CR>
@@ -338,28 +347,19 @@ EOF
 lua << EOF
 require('lualine').setup {
   options = {
-    theme = 'github',
+    theme = 'auto',
     extensions = { 'nvim-tree', 'fzf' },
     component_separators = { '|', '|' },
   },
   sections = {
-    lualine_c = {
+    lualine_b = {
       {
         'filename',
-        file_status = false, -- displays file status (readonly status, modified status)
+        file_status = true, -- displays file status (readonly status, modified status)
         path = 1 -- 0 = just filename, 1 = relative path, 2 = absolute path
       },
-      {
-        'bo:modified',
-        format = function(modified)
-          if modified == "false" then
-            return ""
-          else
-            return "[modified]"
-          end
-        end
-      }
     },
+    lualine_c = {},
     lualine_x = {
       {
         'diagnostics',
@@ -381,7 +381,7 @@ require('lualine').setup {
           'diff'
       }
     }
-  }
+  },
 }
 EOF
 " ===================================
@@ -434,11 +434,11 @@ let g:coq_settings = {
 " " Make sure <Esc> closes completion window but does not leave insert mode
 inoremap <silent><expr><Esc> pumvisible() ? "<C-e>" : "\<Esc>"
 
-lua << EOF
-require("coq_3p") {
-  { src = "copilot", short_name = "COP", accept_key = "<Right>" },
-}
-EOF
+" lua << EOF
+" require("coq_3p") {
+"   { src = "copilot", short_name = "COP", accept_key = "<Right>" },
+" }
+" EOF
 " autocmd VimEnter * COQnow [--shut-up]
 " lua << EOF
 " local coq = require "coq"
@@ -476,6 +476,7 @@ EOF
 " LSP CONFIG
 " ===================================
 lua << EOF
+
 local nvim_lsp = require "lspconfig"
 local coq = require "coq"
 
@@ -502,6 +503,7 @@ local on_attach = function(client, bufnr)
   -- buf_set_keymap('n', '<Leader>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
   buf_set_keymap('n', '<Leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
   buf_set_keymap('n', '<Leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+  buf_set_keymap('n', '<Leader>d', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
   -- buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
   -- buf_set_keymap('n', '<Leader>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
   -- buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
@@ -592,12 +594,12 @@ require'hop'.setup()
 EOF
 
 " map <Leader>h <Plug>(easymotion-linebackward)
-map <Leader>j :HopLineAC<CR>
-map <Leader>k :HopLineBC<CR>
+map <Leader>j <cmd>HopLineAC<CR>
+map <Leader>k <cmd>HopLineBC<CR>
 " map <Leader>l <Plug>(easymotion-lineforward)
-map  <Leader>w :HopWord<CR>
-nmap <Leader>w :HopWord<CR>
-map s :HopChar2<CR>
+map  <Leader>w <cmd>HopWord<CR>
+" nmap <Leader>w <cmd>HopWord<CR>
+map s <cmd>HopChar2<CR>
 " ===================================
 
 
