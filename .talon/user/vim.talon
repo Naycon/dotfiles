@@ -29,3 +29,5 @@ yank end: "y$"
 paste: "p"
 paste before: "P"
 undo: "u"
+
+rename: " rn"
