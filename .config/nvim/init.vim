@@ -25,6 +25,8 @@ Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 "Plug 'nvim-treesitter/nvim-treesitter-angular'
 Plug 'nvim-treesitter/nvim-treesitter-context'
 
+Plug 'simrat39/symbols-outline.nvim'
+
 Plug 'tomtom/tcomment_vim'
 
 Plug 'phaazon/hop.nvim'
@@ -96,7 +98,7 @@ colorscheme github_dark_default
 
 " SHOW LINE NUMBERS
 " ===================================
-set number
+" set number
 " ===================================
 
 
@@ -644,3 +646,11 @@ EOF
 " ===================================
 
 
+" SYMBOLS-OUTLINE
+" ===================================
+lua << EOF
+require("symbols-outline").setup()
+EOF
+
+:nnoremap <silent><leader>o <cmd>SymbolsOutline<CR>
+" ===================================
