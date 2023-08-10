@@ -19,8 +19,6 @@ Plug 'kyazdani42/nvim-tree.lua'
 Plug 'tpope/vim-fugitive'
 Plug 'lewis6991/gitsigns.nvim'
 
-Plug 'tpope/vim-surround'
-
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 "Plug 'nvim-treesitter/nvim-treesitter-angular'
 Plug 'nvim-treesitter/nvim-treesitter-context'
@@ -31,6 +29,8 @@ Plug 'tomtom/tcomment_vim'
 
 Plug 'phaazon/hop.nvim'
 
+Plug 'kylechui/nvim-surround'
+
 Plug 'haya14busa/incsearch.vim'
 
 Plug 'mhartington/formatter.nvim'
@@ -39,15 +39,26 @@ Plug 't9md/vim-choosewin'
 
 Plug 'neovim/nvim-lspconfig'
 
-Plug 'ms-jpq/coq_nvim', {'branch': 'coq'}
-Plug 'ms-jpq/coq.thirdparty', {'branch': '3p'}
+Plug 'hrsh7th/cmp-nvim-lsp'
+Plug 'hrsh7th/cmp-buffer'
+Plug 'hrsh7th/cmp-path'
+Plug 'hrsh7th/cmp-cmdline'
+Plug 'hrsh7th/cmp-nvim-lsp-signature-help'
+Plug 'hrsh7th/nvim-cmp'
+Plug 'dcampos/nvim-snippy'
+Plug 'dcampos/cmp-snippy'
+
+Plug 'MunifTanjim/nui.nvim'
 
 " Color themes
-Plug 'morhetz/gruvbox'
-Plug 'flrnd/candid.vim'
-Plug 'ayu-theme/ayu-vim'
-Plug 'sonph/onehalf', { 'rtp': 'vim' }
+"Plug 'morhetz/gruvbox'
+"Plug 'flrnd/candid.vim'
+"Plug 'ayu-theme/ayu-vim'
+"Plug 'sonph/onehalf', { 'rtp': 'vim' }
 Plug 'projekt0n/github-nvim-theme'
+
+Plug 'rktjmp/lush.nvim'
+Plug 'uloco/bluloco.nvim'
 
 " Plug 'github/copilot.vim'
 
@@ -85,8 +96,21 @@ set termguicolors
 " colorscheme ayu
 "
 " --- github theme ---
-let g:github_dark_sidebar = 0
-colorscheme github_dark_default
+" let g:github_dark_sidebar = 0
+" colorscheme github_dark_default
+"
+" --- github theme ---
+lua << EOF
+require("bluloco").setup({
+  style = "light",               -- "auto" | "dark" | "light"
+  transparent = false,
+  italics = false,
+  terminal = vim.fn.has("gui_running") == 1, -- bluoco colors are enabled in gui terminals per default.
+  guicursor   = true,
+})
+
+vim.cmd('colorscheme bluloco')
+EOF
 " ===================================
 
 
@@ -300,17 +324,82 @@ EOF
 :nnoremap <silent> <C-h> :NvimTreeToggle<CR>
 :nnoremap <silent> <C-j> :NvimTreeFindFile<CR>
 lua << EOF
+
+local function on_attach(bufnr)
+  local api = require('nvim-tree.api')
+
+  local function opts(desc)
+    return { desc = 'nvim-tree: ' .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
+  end
+
+
+  -- Default mappings. Feel free to modify or remove as you wish.
+  --
+  -- BEGIN_DEFAULT_ON_ATTACH
+  vim.keymap.set('n', '<C-]>', api.tree.change_root_to_node,          opts('CD'))
+  vim.keymap.set('n', '<C-e>', api.node.open.replace_tree_buffer,     opts('Open: In Place'))
+  vim.keymap.set('n', '<C-k>', api.node.show_info_popup,              opts('Info'))
+  vim.keymap.set('n', '<C-r>', api.fs.rename_sub,                     opts('Rename: Omit Filename'))
+  vim.keymap.set('n', '<C-t>', api.node.open.tab,                     opts('Open: New Tab'))
+  vim.keymap.set('n', '<C-v>', api.node.open.vertical,                opts('Open: Vertical Split'))
+  vim.keymap.set('n', '<C-x>', api.node.open.horizontal,              opts('Open: Horizontal Split'))
+  vim.keymap.set('n', '<BS>',  api.node.navigate.parent_close,        opts('Close Directory'))
+  vim.keymap.set('n', '<CR>',  api.node.open.edit,                    opts('Open'))
+  vim.keymap.set('n', '<Tab>', api.node.open.preview,                 opts('Open Preview'))
+  vim.keymap.set('n', '>',     api.node.navigate.sibling.next,        opts('Next Sibling'))
+  vim.keymap.set('n', '<',     api.node.navigate.sibling.prev,        opts('Previous Sibling'))
+  vim.keymap.set('n', '.',     api.node.run.cmd,                      opts('Run Command'))
+  vim.keymap.set('n', '-',     api.tree.change_root_to_parent,        opts('Up'))
+  vim.keymap.set('n', 'a',     api.fs.create,                         opts('Create'))
+  vim.keymap.set('n', 'bmv',   api.marks.bulk.move,                   opts('Move Bookmarked'))
+  vim.keymap.set('n', 'B',     api.tree.toggle_no_buffer_filter,      opts('Toggle No Buffer'))
+  vim.keymap.set('n', 'c',     api.fs.copy.node,                      opts('Copy'))
+  vim.keymap.set('n', 'C',     api.tree.toggle_git_clean_filter,      opts('Toggle Git Clean'))
+  vim.keymap.set('n', '[c',    api.node.navigate.git.prev,            opts('Prev Git'))
+  vim.keymap.set('n', ']c',    api.node.navigate.git.next,            opts('Next Git'))
+  vim.keymap.set('n', 'd',     api.fs.remove,                         opts('Delete'))
+  vim.keymap.set('n', 'D',     api.fs.trash,                          opts('Trash'))
+  vim.keymap.set('n', 'E',     api.tree.expand_all,                   opts('Expand All'))
+  vim.keymap.set('n', 'e',     api.fs.rename_basename,                opts('Rename: Basename'))
+  vim.keymap.set('n', ']e',    api.node.navigate.diagnostics.next,    opts('Next Diagnostic'))
+  vim.keymap.set('n', '[e',    api.node.navigate.diagnostics.prev,    opts('Prev Diagnostic'))
+  vim.keymap.set('n', 'F',     api.live_filter.clear,                 opts('Clean Filter'))
+  vim.keymap.set('n', 'f',     api.live_filter.start,                 opts('Filter'))
+  vim.keymap.set('n', 'g?',    api.tree.toggle_help,                  opts('Help'))
+  vim.keymap.set('n', 'gy',    api.fs.copy.absolute_path,             opts('Copy Absolute Path'))
+  vim.keymap.set('n', 'H',     api.tree.toggle_hidden_filter,         opts('Toggle Dotfiles'))
+  vim.keymap.set('n', 'I',     api.tree.toggle_gitignore_filter,      opts('Toggle Git Ignore'))
+  vim.keymap.set('n', 'J',     api.node.navigate.sibling.last,        opts('Last Sibling'))
+  vim.keymap.set('n', 'K',     api.node.navigate.sibling.first,       opts('First Sibling'))
+  vim.keymap.set('n', 'm',     api.marks.toggle,                      opts('Toggle Bookmark'))
+  vim.keymap.set('n', 'o',     api.node.open.edit,                    opts('Open'))
+  vim.keymap.set('n', 'O',     api.node.open.no_window_picker,        opts('Open: No Window Picker'))
+  vim.keymap.set('n', 'p',     api.fs.paste,                          opts('Paste'))
+  vim.keymap.set('n', 'P',     api.node.navigate.parent,              opts('Parent Directory'))
+  vim.keymap.set('n', 'q',     api.tree.close,                        opts('Close'))
+  vim.keymap.set('n', 'r',     api.fs.rename,                         opts('Rename'))
+  vim.keymap.set('n', 'R',     api.tree.reload,                       opts('Refresh'))
+  vim.keymap.set('n', 's',     api.node.run.system,                   opts('Run System'))
+  vim.keymap.set('n', 'S',     api.tree.search_node,                  opts('Search'))
+  vim.keymap.set('n', 'U',     api.tree.toggle_custom_filter,         opts('Toggle Hidden'))
+  vim.keymap.set('n', 'W',     api.tree.collapse_all,                 opts('Collapse'))
+  vim.keymap.set('n', 'x',     api.fs.cut,                            opts('Cut'))
+  vim.keymap.set('n', 'y',     api.fs.copy.filename,                  opts('Copy Name'))
+  vim.keymap.set('n', 'Y',     api.fs.copy.relative_path,             opts('Copy Relative Path'))
+  vim.keymap.set('n', '<2-LeftMouse>',  api.node.open.edit,           opts('Open'))
+  vim.keymap.set('n', '<2-RightMouse>', api.tree.change_root_to_node, opts('CD'))
+  -- END_DEFAULT_ON_ATTACH
+
+  -- Keymap overrides
+  vim.keymap.set('n', 'm', api.fs.rename, opts('Rename'))
+  vim.keymap.set('n', 'r', api.tree.reload, opts('Refresh'))
+end
 local tree_cb = require'nvim-tree.config'.nvim_tree_callback
 require'nvim-tree'.setup {
   view = {
     width = 50,
-    mappings = {
-      list = {
-        { key = "m", cb = tree_cb("rename") },
-        { key = "r", cb = tree_cb("refresh") }
-      }
-    }
   },
+  on_attach = on_attach,
 }
 EOF
 " ===================================
@@ -427,26 +516,43 @@ endfunction
 " ===================================
 
 
-" COQ CONFIG
+" NVIM CMP CONFIG
 " ===================================
-let g:coq_settings = {
-      \ 'auto_start': v:true,
-      \ 'keymap.jump_to_mark': '<C-n>',
-      \ }
-" " Make sure <Esc> closes completion window but does not leave insert mode
-inoremap <silent><expr><Esc> pumvisible() ? "<C-e>" : "\<Esc>"
+lua <<EOF
+  -- Set up nvim-cmp.
+  local cmp = require'cmp'
 
-" lua << EOF
-" require("coq_3p") {
-"   { src = "copilot", short_name = "COP", accept_key = "<Right>" },
-" }
-" EOF
-" autocmd VimEnter * COQnow [--shut-up]
-" lua << EOF
-" local coq = require "coq"
-"
-" vim.cmd([[COQnow]])
-" EOF
+  cmp.setup({
+    snippet = {
+      -- REQUIRED - you must specify a snippet engine
+      expand = function(args)
+        require('snippy').expand_snippet(args.body) -- For `snippy` users.
+      end,
+    },
+    window = {
+      -- completion = cmp.config.window.bordered(),
+      -- documentation = cmp.config.window.bordered(),
+    },
+    mapping = cmp.mapping.preset.insert({
+      ['<Tab>'] = cmp.mapping.select_next_item(),
+      ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+      ['<C-f>'] = cmp.mapping.scroll_docs(4),
+      ['<C-Space>'] = cmp.mapping.complete(),
+      ['<C-e>'] = cmp.mapping.abort(),
+      ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+    }),
+    experimental = {
+      ghost_text = true -- NOTE: this feature conflicts with copilot.vim's preview. Turn off if using that plugin!
+    },
+    sources = cmp.config.sources({
+      { name = 'nvim_lsp' },
+      { name = 'nvim_lsp_signature_help' },
+      { name = 'snippy' }, -- For snippy users.
+    }, {
+      { name = 'buffer' },
+    })
+  })
+EOF
 " ===================================
 
 
@@ -480,7 +586,8 @@ inoremap <silent><expr><Esc> pumvisible() ? "<C-e>" : "\<Esc>"
 lua << EOF
 
 local nvim_lsp = require "lspconfig"
-local coq = require "coq"
+-- local coq = require "coq"
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
 local on_attach = function(client, bufnr)
   local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
@@ -516,7 +623,8 @@ local on_attach = function(client, bufnr)
 
 end
 
-nvim_lsp.tsserver.setup(coq.lsp_ensure_capabilities({
+-- nvim_lsp.tsserver.setup(coq.lsp_ensure_capabilities({
+nvim_lsp.tsserver.setup {
   on_attach = on_attach,
   flags = {
     debounce_text_changes = 150,
@@ -530,54 +638,26 @@ nvim_lsp.tsserver.setup(coq.lsp_ensure_capabilities({
       allowRenameOfImportPath = true
     }
   },
-}))
+  capabilities = capabilities
+}
 -- nvim_lsp.angularls.setup{}
-nvim_lsp.cssls.setup(coq.lsp_ensure_capabilities({
+-- nvim_lsp.cssls.setup(coq.lsp_ensure_capabilities({
+nvim_lsp.cssls.setup {
+  capabilities = capabilities
   -- on_attach = on_attach,
-}))
-nvim_lsp.html.setup(coq.lsp_ensure_capabilities({
+}
+-- nvim_lsp.html.setup(coq.lsp_ensure_capabilities({
+nvim_lsp.html.setup {
+  capabilities = capabilities
   -- on_attach = on_attach,
-}))
-nvim_lsp.jsonls.setup(coq.lsp_ensure_capabilities({
+}
+-- nvim_lsp.jsonls.setup(coq.lsp_ensure_capabilities({
+nvim_lsp.jsonls.setup {
+  capabilities = capabilities
   -- on_attach = on_attach,
-}))
+}
 nvim_lsp.eslint.setup{}
 EOF
-" ===================================
-
-
-" LSPSAGA (buggy, disabled)
-" ===================================
-" lua << EOF
-" local saga = require 'lspsaga'
-" saga.init_lsp_saga()
-" EOF
-"
-" " Show definition and references
-" nnoremap <silent> gd <cmd>lua require'lspsaga.provider'.lsp_finder()<CR>
-" " Preview definition
-" nnoremap <silent> gp <cmd>lua require'lspsaga.provider'.preview_definition()<CR>
-" " Code actions
-" nnoremap <silent><leader>ca <cmd>lua require('lspsaga.codeaction').code_action()<CR>
-" vnoremap <silent><leader>ca :<C-U>lua require('lspsaga.codeaction').range_code_action()<CR>
-" " Hover doc
-" nnoremap <silent> K <cmd>lua require('lspsaga.hover').render_hover_doc()<CR>
-" " Signature help
-" nnoremap <silent> gs <cmd>lua require('lspsaga.signaturehelp').signature_help()<CR>
-" " Rename
-" nnoremap <silent><leader>rn <cmd>lua require('lspsaga.rename').rename()<CR>
-" " Show diagnostics
-" nnoremap <silent><leader>cd <cmd>lua require'lspsaga.diagnostic'.show_line_diagnostics()<CR>
-" " Jump to diagnostics
-" nnoremap <silent><leader>cn <cmd>lua require'lspsaga.diagnostic'.navigate("next")()<CR>
-" nnoremap <silent><leader>cp <cmd>lua require'lspsaga.diagnostic'.navigate("prev")()<CR>
-" " Show terminal
-" nnoremap <silent> gt <cmd>lua require('lspsaga.floaterm').open_float_terminal()<CR>
-" " Scroll down hover doc or scroll in definition preview
-" nnoremap <silent><leader>d <cmd>lua require('lspsaga.action').smart_scroll_with_saga(1)<CR>
-" " Scroll up hover doc
-" nnoremap <silent><leader>u <cmd>lua require('lspsaga.action').smart_scroll_with_saga(-1)<CR>
-"
 " ===================================
 
 
@@ -587,9 +667,16 @@ nmap <End> <Plug>(choosewin)
 " ===================================
 
 
-" HOP CONFIG
+" NVIM SURROUND CONFIG
+" ===================================
+lua << EOF
+require("nvim-surround").setup()
+EOF
 " ===================================
 
+
+" HOP CONFIG
+" ===================================
 lua << EOF
 -- require'hop'.setup { keys = 'FKLAHSDGWERUIOGTYPQNVBMCXJ' }
 require'hop'.setup()
