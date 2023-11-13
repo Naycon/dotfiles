@@ -29,7 +29,7 @@ return {
             buf_set_keymap('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
             -- buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
             buf_set_keymap('n', '<Leader>cs', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
-            buf_set_keymap('n', '<Leader>h', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
+            buf_set_keymap('n', '<Leader>ch', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
 
             -- buf_set_keymap('n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
             -- buf_set_keymap('n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
@@ -38,7 +38,7 @@ return {
             -- buf_set_keymap('n', '<Leader>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
             buf_set_keymap('n', '<Leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
             buf_set_keymap('n', '<Leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-            buf_set_keymap('n', '<Leader>d', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
+            buf_set_keymap('n', '<Leader>cd', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
             -- buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
             -- buf_set_keymap('n', '<Leader>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
             -- buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
@@ -51,9 +51,8 @@ return {
         })
       end,
       -- ["vtsls"] = function()
-      --   require("rust-tools").setup {}
-      --   require('lspconfig').vtsls.setup({
       -- end,
+      ['jdtls'] = function() end,
     },
     dependencies = {
       'hrsh7th/cmp-nvim-lsp',

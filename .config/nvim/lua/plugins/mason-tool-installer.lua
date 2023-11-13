@@ -7,6 +7,8 @@ return {
     -- start; they should be the names Mason uses for each tool
     ensure_installed = {
       'prettierd',
+      'js-debug-adapter',
+      'jdtls',
     },
   },
   dependencies = {
