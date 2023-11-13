@@ -1,7 +1,9 @@
 [alias]
 	lg = log --graph --pretty=tformat:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --decorate=full
 	amend = commit --amend --no-edit
+	forcepush = push -f
   # Enables `git autosquash master`
-  autosquash = "!f() { \
-                  git rebase --autosquash -i $1; \
-                }; f"
+  ; autosquash = "!f() { \
+  ;                 git rebase --autosquash -i $1; \
+  ;               }; f"
+  autosquash = rebase --autosquash -i
