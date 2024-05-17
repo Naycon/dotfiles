@@ -1,6 +1,7 @@
 return {
   "nvim-neotest/neotest",
   dependencies = {
+    "nvim-neotest/nvim-nio",
     "nvim-lua/plenary.nvim",
     "treesitter",
     "antoinemadec/FixCursorHold.nvim",
@@ -10,7 +11,8 @@ return {
     require'neotest'.setup({
       adapters = {
         require('neotest-jest')({
-          jestCommand = "yarn test --watch ",
+          jestCommand = require('neotest-jest.jest-util').getJestCommand(vim.fn.expand '%:p:h') .. ' --watch',
+          -- jestCommand = "npm test:watch",
           -- jestCommand = "yarn test --",
           -- jestConfigFile = "custom.jest.config.ts",
           env = { CI = true },

@@ -7,3 +7,5 @@
   ;                 git rebase --autosquash -i $1; \
   ;               }; f"
   autosquash = rebase --autosquash -i
+[core]
+	editor = nvim

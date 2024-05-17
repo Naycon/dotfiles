@@ -44,6 +44,15 @@ vim.o.shiftwidth = 2
 
 
 --------------------------------------------------
+-- BACKUPCOPY BEHAVIOUR
+--------------------------------------------------
+-- Sets the backupcopy behaviour to avoid issues
+-- with watchers (e.g. parcel) on Windows WSL.
+vim.o.backupcopy = "yes"
+--------------------------------------------------
+
+
+--------------------------------------------------
 -- HIGHLIGHT ON YANK
 --------------------------------------------------
 local highlight_yank = vim.api.nvim_create_augroup("highlight_yank", {})
@@ -73,9 +82,31 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 -- FORMAT ON SAVE
 --------------------------------------------------
 vim.api.nvim_create_autocmd("BufWritePost", {
-  pattern = { "*.ts", "*.tsx", "*.js" },
+  pattern = { "*.ts", "*.tsx", "*.js", "*.jsx", "*.mjs"},
   command = "FormatWrite",
 })
+--------------------------------------------------
+
+
+--------------------------------------------------
+-- CLIPBOARD CONFIG
+--------------------------------------------------
+vim.opt.clipboard = "unnamedplus"
+
+if vim.fn.has("wsl") == 1 then
+  vim.g.clipboard = {
+    name = "win32yank-wsl",
+    copy = {
+      ["+"] = "win32yank.exe -i --crlf",
+      ["*"] = "win32yank.exe -i --crlf",
+    },
+    paste = {
+      ["+"] = "win32yank.exe -o --lf",
+      ["*"] = "win32yank.exe -o --lf",
+    },
+    cache_enabled = 0,
+  }
+end
 --------------------------------------------------
 
 
@@ -134,4 +165,11 @@ require("lazy").setup("plugins")
 -- SET COLORSCHEME
 --------------------------------------------------
 vim.cmd('colorscheme bluloco')
+--------------------------------------------------
+
+
+--------------------------------------------------
+-- SET END OF BUFFER FILL CHARACTER TO SPACE
+--------------------------------------------------
+vim.opt.fillchars='eob: '
 --------------------------------------------------
