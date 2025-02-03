@@ -8,7 +8,7 @@ return {
       local configs = require("nvim-treesitter.configs")
 
       configs.setup({
-        ensure_installed = { "css", "dart", "dockerfile", "html", "java", "javascript", "jsdoc", "json", "lua", "python", "scss", "tsx", "typescript", "vim", "yaml" }, -- "all" or a list of languages
+        ensure_installed = { "css", "dart", "dockerfile", "graphql", "html", "java", "javascript", "jsdoc", "json", "lua", "python", "scss", "tsx", "typescript", "vim", "yaml" }, -- "all" or a list of languages
         ignore_install = { "vala", "latex" }, -- List of parsers to ignore installing
         highlight = {
           enable = true,              -- false will disable the whole extension
