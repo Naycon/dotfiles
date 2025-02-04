@@ -75,7 +75,18 @@ return {
     -- gc to see command history
     vim.keymap.set('n', 'gc', builtin.command_history, {})
     -- ctrl + g to search all files with Telescope
-    vim.keymap.set('n', '<C-g>', ':Telescope grep_string search=', {})
+    -- vim.keymap.set('n', '<C-g>', ':Telescope grep_string search=', {})
+    vim.keymap.set('n', '<C-g>', function()
+      local user_input = vim.fn.input("Search string: ")
+      local hist_cmd = 'lua require("telescope.builtin").grep_string({search="' .. user_input .. '"})'
+
+
+      vim.fn.histadd("cmd", hist_cmd)
+
+      builtin.grep_string({ search = user_input })
+      -- local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+      -- vim.api.nvim_buf_set_text(0, row - 1, col, row - 1, col, { "_{" .. user_input .. "}" })
+    end)
     -- ctrl + f to live search all files with Telescope
     vim.keymap.set('n', '<C-f>', builtin.current_buffer_fuzzy_find, {})
     vim.keymap.set('n', '<C-a>', builtin.live_grep, {})
